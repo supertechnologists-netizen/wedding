@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Гості · Юлія &amp; Євгеній</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#4B0F1C">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap">
+<style>
+/* Приватний дашборд молодят. Палітра й шрифти — ті самі, що в index.html. */
+:root {
+  --ink: #17050A;
+  --wine-deep: #2A0810;
+  --wine: #4B0F1C;
+  --wine-soft: #6E1A2C;
+  --milk: #F4EBE4;
+  --on-wine: #F4EBE4;
+  --on-wine-muted: rgba(244, 235, 228, .68);
+  --on-wine-faint: rgba(244, 235, 228, .45);
+  --on-wine-line: rgba(244, 235, 228, .24);
+  --f-display: "Cormorant Garamond", "Cormorant", Georgia, "Times New Roman", serif;
+  --f-body: "Jost", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --gutter: clamp(16px, 5vw, 56px);
+  --ease: cubic-bezier(.22, .61, .2, 1);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--wine-deep);
+  color: var(--on-wine);
+  font-family: var(--f-body);
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+h1, h2, h3 { margin: 0; font-weight: 300; }
+p { margin: 0; }
+button, input { font: inherit; color: inherit; }
+
+.wrap { width: 100%; max-width: 1040px; margin-inline: auto; padding-inline: var(--gutter); }
+.eyebrow { font-size: .72rem; font-weight: 400; letter-spacing: .34em; text-transform: uppercase; color: var(--on-wine-muted); }
+
+header.top {
+  background: var(--wine);
+  padding-block: clamp(48px, 9vw, 96px) clamp(36px, 6vw, 64px);
+  text-align: center;
+  border-bottom: 1px solid var(--on-wine-line);
+}
+header.top h1 {
+  font-family: var(--f-display);
+  font-size: clamp(2.6rem, 8vw, 4.6rem);
+  line-height: 1.05;
+  margin-top: 14px;
+}
+header.top h1 em { font-style: italic; font-weight: 300; }
+header.top .sub { margin-top: 12px; color: var(--on-wine-muted); font-family: var(--f-display); font-style: italic; font-size: 1.25rem; }
+
+.bar {
+  display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: space-between;
+  padding-block: 22px; border-bottom: 1px solid var(--on-wine-line);
+  font-size: .85rem; color: var(--on-wine-muted);
+}
+.bar .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.btn {
+  font-size: .7rem; font-weight: 500; letter-spacing: .26em; text-transform: uppercase;
+  color: var(--milk); background: transparent;
+  border: 1px solid var(--on-wine-line); border-radius: 999px;
+  padding: 11px 20px 11px calc(20px + .26em);
+  cursor: pointer; transition: border-color .3s var(--ease), background .3s var(--ease), color .3s var(--ease);
+}
+.btn:hover { border-color: var(--milk); }
+.btn.solid { background: var(--milk); color: var(--wine); border-color: var(--milk); }
+.btn.solid:hover { background: transparent; color: var(--milk); }
+.btn:focus-visible { outline: 1px solid var(--milk); outline-offset: 3px; }
+.btn:disabled { opacity: .5; cursor: default; }
+
+section { padding-block: clamp(36px, 6vw, 64px); }
+section + section { border-top: 1px solid var(--on-wine-line); }
+h2 { font-family: var(--f-display); font-size: clamp(1.8rem, 4.5vw, 2.4rem); margin-top: 8px; margin-bottom: 28px; }
+
+/* Stats */
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--on-wine-line); }
+.stat { padding: 26px 18px; text-align: center; }
+.stat + .stat { border-left: 1px solid var(--on-wine-line); }
+.stat .num { font-family: var(--f-display); font-size: clamp(2.6rem, 7vw, 3.8rem); line-height: 1; }
+.stat .lbl { margin-top: 10px; font-size: .7rem; letter-spacing: .24em; text-transform: uppercase; color: var(--on-wine-muted); }
+.stat.main { background: var(--wine); }
+@media (max-width: 640px) {
+  .stats { grid-template-columns: 1fr 1fr; }
+  .stat:nth-child(3) { border-left: 0; }
+  .stat:nth-child(n+3) { border-top: 1px solid var(--on-wine-line); }
+}
+
+/* Drinks */
+.drinks { display: grid; gap: 16px; }
+.drink { display: grid; grid-template-columns: minmax(120px, 190px) 1fr auto; gap: 16px; align-items: center; }
+.drink .track { height: 1px; background: var(--on-wine-line); position: relative; }
+.drink .fill { position: absolute; left: 0; top: -1px; height: 3px; background: var(--milk); transform-origin: left; animation: grow 1.2s both var(--ease); }
+.drink .cnt { font-family: var(--f-display); font-size: 1.5rem; min-width: 2ch; text-align: right; }
+@keyframes grow { from { transform: scaleX(0); } }
+@media (max-width: 520px) { .drink { grid-template-columns: 1fr auto; } .drink .track { grid-column: 1 / -1; grid-row: 2; } }
+
+/* Guest list */
+.controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.tab { font-size: .72rem; letter-spacing: .2em; text-transform: uppercase; background: none; border: 1px solid transparent; border-radius: 999px; padding: 8px 14px; color: var(--on-wine-muted); cursor: pointer; }
+.tab[aria-pressed="true"] { border-color: var(--on-wine-line); color: var(--milk); }
+.search {
+  background: transparent; border: 0; border-bottom: 1px solid var(--on-wine-line);
+  padding: 8px 2px; min-width: 0; width: 240px; max-width: 100%;
+}
+.search:focus { outline: none; border-bottom-color: var(--milk); }
+.search::placeholder { color: var(--on-wine-faint); font-style: italic; }
+
+.list { border-top: 1px solid var(--on-wine-line); }
+.guest {
+  display: grid; grid-template-columns: 1.4fr 1fr 1.6fr; gap: 6px 20px;
+  padding: 18px 4px; border-bottom: 1px solid var(--on-wine-line);
+}
+.guest .name { font-family: var(--f-display); font-size: 1.35rem; line-height: 1.25; }
+.guest .when { font-size: .78rem; color: var(--on-wine-faint); }
+.guest .status { font-size: .9rem; }
+.guest .status .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 8px; vertical-align: middle; background: var(--milk); }
+.guest.no .status .dot { background: transparent; border: 1px solid var(--on-wine-muted); }
+.guest.no .status { color: var(--on-wine-muted); }
+.guest .detail { font-size: .9rem; color: var(--on-wine-muted); }
+.guest .phone { font-size: .85rem; color: var(--on-wine-muted); text-decoration: none; border-bottom: 1px solid var(--on-wine-line); }
+.guest .phone:hover { color: var(--milk); border-bottom-color: var(--milk); }
+.guest .changed { font-size: .78rem; color: var(--on-wine-faint); font-style: italic; }
+.warn { padding: 14px 18px; margin-top: 18px; border: 1px solid var(--on-wine-line); font-size: .85rem; color: var(--on-wine-muted); }
+.guest .note { font-family: var(--f-display); font-style: italic; font-size: 1.08rem; color: var(--on-wine); margin-top: 4px; }
+@media (max-width: 720px) { .guest { grid-template-columns: 1fr; } }
+.empty { padding: 36px 4px; color: var(--on-wine-muted); font-style: italic; font-family: var(--f-display); font-size: 1.2rem; text-align: center; }
+
+/* Gate: no key / wrong key / error */
+.gate { min-height: 60vh; display: grid; place-items: center; text-align: center; padding: 48px var(--gutter); }
+.gate h2 { margin-bottom: 12px; }
+.gate p { color: var(--on-wine-muted); max-width: 30em; margin-inline: auto; }
+
+footer { padding-block: 36px 48px; text-align: center; font-size: .78rem; color: var(--on-wine-faint); }
+
+@media (prefers-reduced-motion: reduce) { .drink .fill { animation: none; } }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <p class="eyebrow">Лише для молодят</p>
+    <h1>Юлія <em>&amp;</em> Євгеній</h1>
+    <p class="sub">Хто буде з нами</p>
+  </div>
+</header>
+
+<div class="gate" id="gate">
+  <div>
+    <h2 id="gate-title">Завантажуємо відповіді…</h2>
+    <p id="gate-text"></p>
+    <p style="margin-top:22px"><button class="btn" id="gate-retry" hidden>Спробувати ще раз</button></p>
+  </div>
+</div>
+
+<main id="app" hidden>
+  <div class="wrap">
+    <p class="warn" id="warn" hidden>Потрібне оновлення системи анкет. Повідомте, будь ласка, координатора.</p>
+    <div class="bar">
+      <span id="updated">Оновлено щойно</span>
+      <div class="actions">
+        <button class="btn" id="refresh">Оновити</button>
+        <button class="btn solid" id="export">Завантажити Excel</button>
+      </div>
+    </div>
+
+    <section>
+      <p class="eyebrow">Підсумок</p>
+      <h2>Гості</h2>
+      <div class="stats">
+        <div class="stat main"><div class="num" id="s-people">0</div><div class="lbl">Осіб прийде</div></div>
+        <div class="stat"><div class="num" id="s-yes">0</div><div class="lbl">Підтвердили</div></div>
+        <div class="stat"><div class="num" id="s-no">0</div><div class="lbl">Не зможуть</div></div>
+        <div class="stat"><div class="num" id="s-total">0</div><div class="lbl">Відповіли</div></div>
+      </div>
+    </section>
+
+    <section>
+      <p class="eyebrow">Для бару</p>
+      <h2>Напої</h2>
+      <div class="drinks" id="drinks"></div>
+      <p class="empty" id="drinks-empty" hidden>Ще ніхто не обрав напої</p>
+    </section>
+
+    <section>
+      <p class="eyebrow">Відповіді</p>
+      <h2>Список гостей</h2>
+      <div class="controls">
+        <div class="tabs" role="group" aria-label="Фільтр">
+          <button class="tab" data-filter="all" aria-pressed="true">Усі</button>
+          <button class="tab" data-filter="yes" aria-pressed="false">Прийдуть</button>
+          <button class="tab" data-filter="no" aria-pressed="false">Не зможуть</button>
+        </div>
+        <input class="search" id="search" type="search" placeholder="Пошук за імʼям" aria-label="Пошук за імʼям">
+      </div>
+      <div class="list" id="list"></div>
+      <p class="empty" id="list-empty" hidden>Нікого не знайдено</p>
+    </section>
+  </div>
+</main>
+
+<footer>Сторінка оновлюється сама щохвилини. Не пересилайте це посилання гостям.</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
+<script>
+(function () {
+  'use strict';
+  // Та сама адреса, що й RSVP_ENDPOINT в index.html
+  var ENDPOINT = 'https://script.google.com/macros/s/AKfycbzw0UqXwwbZKh7Of_7WxYAQDMh3w1e1gc1i66Trxr_oQb9XFghIqneE0mnkp4CKw1gm/exec';
+  var DRINKS = ['Червоне вино', 'Біле вино', 'Ігристе', 'Міцні напої', 'Безалкогольні'];
+  var REFRESH_MS = 60000;
+  var SCRIPT_VERSION = 2;  // має збігатися з VERSION у rsvp/Code.gs
+
+  // Ключ у фрагменті (#...), щоб він не потрапляв у логи сервера та Referer
+  var key = decodeURIComponent(location.hash.replace(/^#(key=)?/, ''));
+  var $ = function (id) { return document.getElementById(id); };
+  var rows = [], all = [], filter = 'all', loadedAt = null, loading = false;
+
+  function gate(title, text, retry) {
+    $('gate-title').textContent = title;
+    $('gate-text').textContent = text || '';
+    $('gate-retry').hidden = !retry;
+    $('gate').hidden = false;
+    $('app').hidden = true;
+  }
+
+  function load(silent) {
+    if (loading) return;
+    loading = true;
+    $('refresh').disabled = true;
+    if (!silent && !loadedAt) gate('Завантажуємо відповіді…');
+    fetch(ENDPOINT + '?key=' + encodeURIComponent(key), { cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (!data.ok) {
+          gate('Посилання недійсне', 'Ключ у посиланні не підійшов. Попросіть у координатора актуальне посилання.');
+          return;
+        }
+        all = data.rows.slice().sort(function (a, b) { return a.time < b.time ? 1 : -1; });
+        rows = latestPerGuest(all);
+        $('warn').hidden = data.version === SCRIPT_VERSION;
+        loadedAt = new Date();
+        render();
+        $('gate').hidden = true;
+        $('app').hidden = false;
+      })
+      .catch(function () {
+        if (!loadedAt) gate('Не вдалося завантажити', 'Перевірте інтернет і спробуйте ще раз.', true);
+        else $('updated').textContent = 'Не вдалося оновити — показано дані від ' + fmtTime(loadedAt);
+      })
+      .then(function () { loading = false; $('refresh').disabled = false; });
+  }
+
+  // Один гість — один рядок: беремо останню відповідь з того самого номера телефону
+  // (+380 67 123 45 67 і 067-123-45-67 — один номер). Без телефону — за імʼям.
+  function guestKey(r) {
+    var digits = r.phone.replace(/\D/g, '');
+    return digits.length >= 9 ? 'tel:' + digits.slice(-9) : 'name:' + r.name.trim().toLowerCase().replace(/\s+/g, ' ');
+  }
+  function latestPerGuest(sorted) {
+    var seen = {}, out = [];
+    sorted.forEach(function (r) {
+      var k = guestKey(r);
+      if (seen[k]) { seen[k].changes++; return; }
+      seen[k] = r;
+      r.changes = 0;
+      out.push(r);
+    });
+    return out;
+  }
+
+  function fmtTime(d) {
+    return d.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
+  }
+  function fmtDate(iso) {
+    var d = new Date(iso);
+    if (isNaN(d)) return iso;
+    return d.toLocaleDateString('uk-UA', { day: 'numeric', month: 'long' }) + ', ' + fmtTime(d);
+  }
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  function plural(n, one, few, many) {
+    var m10 = n % 10, m100 = n % 100;
+    if (m10 === 1 && m100 !== 11) return one;
+    if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return few;
+    return many;
+  }
+
+  function render() {
+    var yes = rows.filter(function (r) { return r.attend; });
+    var people = yes.reduce(function (s, r) { return s + (r.guests || 1); }, 0);
+    $('s-people').textContent = people;
+    $('s-yes').textContent = yes.length;
+    $('s-no').textContent = rows.length - yes.length;
+    $('s-total').textContent = rows.length;
+    $('updated').textContent = 'Оновлено о ' + fmtTime(loadedAt);
+
+    // Напої: скільки відповідей обрали кожен варіант
+    var counts = {};
+    yes.forEach(function (r) {
+      r.drinks.split(',').map(function (s) { return s.trim(); }).filter(Boolean)
+        .forEach(function (d) { counts[d] = (counts[d] || 0) + 1; });
+    });
+    var names = DRINKS.concat(Object.keys(counts).filter(function (d) { return DRINKS.indexOf(d) < 0; }));
+    var max = Math.max.apply(null, names.map(function (d) { return counts[d] || 0; }).concat(1));
+    var box = $('drinks');
+    box.textContent = '';
+    names.forEach(function (d) {
+      var c = counts[d] || 0;
+      var row = el('div', 'drink');
+      row.appendChild(el('span', null, d));
+      var track = el('div', 'track');
+      var fill = el('div', 'fill');
+      fill.style.width = (c / max * 100) + '%';
+      track.appendChild(fill);
+      row.appendChild(track);
+      row.appendChild(el('span', 'cnt', c));
+      box.appendChild(row);
+    });
+    $('drinks-empty').hidden = Object.keys(counts).length > 0;
+
+    renderList();
+  }
+
+  function renderList() {
+    var q = $('search').value.trim().toLowerCase();
+    var list = $('list');
+    list.textContent = '';
+    var shown = rows.filter(function (r) {
+      if (filter === 'yes' && !r.attend) return false;
+      if (filter === 'no' && r.attend) return false;
+      return !q || r.name.toLowerCase().indexOf(q) >= 0 ||
+        (q.replace(/\D/g, '') && r.phone.replace(/\D/g, '').indexOf(q.replace(/\D/g, '')) >= 0);
+    });
+    shown.forEach(function (r) {
+      var g = el('div', 'guest' + (r.attend ? '' : ' no'));
+      var c1 = el('div');
+      c1.appendChild(el('div', 'name', r.name));
+      if (r.phone) {
+        var tel = el('a', 'phone', r.phone);
+        tel.href = 'tel:' + r.phone.replace(/[^\d+]/g, '');
+        c1.appendChild(tel);
+      }
+      c1.appendChild(el('div', 'when', fmtDate(r.time)));
+      if (r.changes) c1.appendChild(el('div', 'changed', 'Відповідь змінено' + (r.changes > 1 ? ' ' + r.changes + ' рази' : '')));
+      var c2 = el('div', 'status');
+      c2.appendChild(el('span', 'dot'));
+      c2.appendChild(document.createTextNode(r.attend
+        ? 'Прийде' + (r.guests > 1 ? ' · ' + r.guests + ' ' + plural(r.guests, 'особа', 'особи', 'осіб') : '')
+        : 'Не зможе'));
+      var c3 = el('div', 'detail');
+      if (r.attend) c3.appendChild(el('div', null, r.drinks || 'Напої не обрано'));
+      if (r.note) c3.appendChild(el('div', 'note', '«' + r.note + '»'));
+      g.appendChild(c1); g.appendChild(c2); g.appendChild(c3);
+      list.appendChild(g);
+    });
+    $('list-empty').textContent = rows.length ? 'Нікого не знайдено' : 'Відповідей поки немає';
+    $('list-empty').hidden = shown.length > 0;
+  }
+
+  function exportXlsx() {
+    if (!window.XLSX) { alert('Модуль Excel ще завантажується, спробуйте за кілька секунд.'); return; }
+    function sheet(list) {
+      var data = [['Час', 'Імʼя', 'Телефон', 'Чи буде', 'Скільки осіб', 'Напої', 'Коментар']].concat(list.map(function (r) {
+        return [fmtDate(r.time), r.name, r.phone, r.attend ? 'Так' : 'Ні', r.attend ? r.guests : '', r.drinks, r.note];
+      }));
+      var ws = XLSX.utils.aoa_to_sheet(data);
+      ws['!cols'] = [{ wch: 22 }, { wch: 26 }, { wch: 18 }, { wch: 9 }, { wch: 13 }, { wch: 34 }, { wch: 40 }];
+      return ws;
+    }
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, sheet(rows), 'Гості');
+    XLSX.utils.book_append_sheet(wb, sheet(all), 'Усі відповіді');
+    XLSX.writeFile(wb, 'Гості — Юлія & Євгеній.xlsx');
+  }
+
+  document.querySelectorAll('.tab').forEach(function (t) {
+    t.addEventListener('click', function () {
+      filter = t.getAttribute('data-filter');
+      document.querySelectorAll('.tab').forEach(function (x) { x.setAttribute('aria-pressed', String(x === t)); });
+      renderList();
+    });
+  });
+  $('search').addEventListener('input', renderList);
+  $('refresh').addEventListener('click', function () { load(); });
+  $('gate-retry').addEventListener('click', function () { load(); });
+  $('export').addEventListener('click', exportXlsx);
+
+  if (!key) {
+    gate('Потрібне особисте посилання', 'Ця сторінка відкривається лише за посиланням із ключем, яке ви отримали від координатора.');
+    return;
+  }
+  load();
+  setInterval(function () { if (!document.hidden) load(true); }, REFRESH_MS);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) load(true); });
+})();
+</script>
+</body>
+</html>
