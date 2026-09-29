@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Сайти-запрошення · рекламні слайди</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap">
+<style>
+/* Палітра та шрифти взяті з першого сайту (index.html): вино + молочний папір,
+   Cormorant Garamond + Jost, подвійна тонка рамка з ромбами. */
+:root {
+  --ink: #17050A;
+  --wine-deep: #2A0810;
+  --wine: #4B0F1C;
+  --wine-soft: #6E1A2C;
+  --milk: #F4EBE4;
+  --milk-2: #EBDDD3;
+  --powder: #E9CFCB;
+  --gold: #BFA07A;
+  --on-wine-muted: rgba(244, 235, 228, .68);
+  --on-wine-line: rgba(244, 235, 228, .22);
+  --on-milk: #3B0A15;
+  --on-milk-muted: rgba(59, 10, 21, .66);
+  --on-milk-line: rgba(75, 15, 28, .2);
+  --f-display: "Cormorant Garamond", Georgia, serif;
+  --f-body: "Jost", "Helvetica Neue", Arial, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #555; font-family: var(--f-body); font-weight: 300; -webkit-font-smoothing: antialiased; }
+body:not(.export) { padding: 40px; display: grid; gap: 40px; justify-content: center; }
+.export { background: none; }
+@page { margin: 0; }
+img { display: block; }
+
+.slide {
+  position: relative;
+  width: 1080px;
+  overflow: hidden;
+  isolation: isolate;
+  break-after: page;
+}
+.post .slide { height: 1350px; }
+.square .slide { height: 1080px; }
+.story .slide { height: 1920px; }
+.slide > * { position: absolute; }
+
+/* Поверхні */
+.wine {
+  color: var(--milk);
+  background: radial-gradient(110% 75% at 50% 32%, #5C1424 0%, var(--wine) 36%, var(--wine-deep) 74%, var(--ink) 100%);
+}
+.deep {
+  color: var(--milk);
+  background:
+    radial-gradient(70% 50% at 50% 45%, rgba(110, 26, 44, .55), transparent 70%),
+    linear-gradient(var(--wine-deep), var(--ink));
+}
+.milk { color: var(--on-milk); background: radial-gradient(90% 70% at 50% 40%, #F8F1EC, var(--milk) 55%, var(--milk-2)); }
+.powder { color: var(--on-milk); background: radial-gradient(80% 60% at 50% 20%, #F8F1EC, var(--milk) 50%, #EED9D3); }
+
+/* Плівкове зерно, як на сайті */
+.slide::after {
+  content: ""; position: absolute; inset: 0; z-index: 40; pointer-events: none; opacity: .07;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+.milk::after, .powder::after { opacity: .05; }
+
+/* Подвійна рамка з ромбами */
+.frame { inset: 34px; border: 1px solid var(--on-wine-line); pointer-events: none; z-index: 30; }
+.frame::before { content: ""; position: absolute; inset: 8px; border: 1px solid rgba(244, 235, 228, .08); }
+.frame i { position: absolute; left: 50%; width: 9px; height: 9px; margin-left: -5px; border: 1px solid var(--gold); transform: rotate(45deg); background: var(--wine-deep); }
+.frame i:first-child { top: -5px; }
+.frame i:last-child { bottom: -5px; }
+.milk .frame, .powder .frame { border-color: var(--on-milk-line); }
+.milk .frame::before, .powder .frame::before { border-color: rgba(75, 15, 28, .07); }
+.milk .frame i, .powder .frame i { background: var(--milk); }
+.story .frame { inset: 40px; }
+
+/* Типографіка */
+.eyebrow { font-family: var(--f-body); font-weight: 400; font-size: 15px; letter-spacing: .34em; text-transform: uppercase; }
+.wine .eyebrow, .deep .eyebrow { color: var(--on-wine-muted); }
+.milk .eyebrow, .powder .eyebrow { color: var(--on-milk-muted); }
+.title { font-family: var(--f-display); font-weight: 300; line-height: 1.02; letter-spacing: -.012em; text-wrap: balance; }
+.title em { font-style: italic; }
+.wine .title em, .deep .title em { color: var(--powder); }
+.milk .title em, .powder .title em { color: var(--wine-soft); }
+.lead { font-family: var(--f-body); font-weight: 300; line-height: 1.5; }
+.wine .lead, .deep .lead { color: var(--on-wine-muted); }
+.milk .lead, .powder .lead { color: var(--on-milk-muted); }
+.center { text-align: center; }
+.page { font-size: 14px; letter-spacing: .3em; }
+.story .page { display: none; }
+.slide .eyebrow.page { left: auto !important; right: 96px !important; }
+.square .slide .eyebrow.page { right: 90px !important; }
+
+/* Місце під логотип */
+.logo { display: grid; place-items: center; z-index: 5; }
+.logo img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.logo.empty { border: 1px dashed currentColor; border-radius: 50%; opacity: .55; }
+.logo.empty::before { content: "логотип"; font-family: var(--f-body); font-size: 11px; letter-spacing: .22em; text-transform: uppercase; }
+
+/* Смартфон */
+.phone {
+  --w: 380px;
+  width: var(--w);
+  height: calc(var(--w) * 2.164 + var(--w) * .064);
+  padding: calc(var(--w) * .032);
+  border-radius: calc(var(--w) * .16);
+  background: linear-gradient(145deg, #2b1a1e, #0c0507 40%, #1c1013);
+  box-shadow:
+    inset 0 0 0 1.5px rgba(255, 255, 255, .14),
+    inset 0 0 0 5px #070304,
+    0 60px 90px -30px rgba(10, 2, 4, .75),
+    0 20px 40px -20px rgba(10, 2, 4, .6);
+  z-index: 10;
+}
+.milk .phone, .powder .phone {
+  box-shadow:
+    inset 0 0 0 1.5px rgba(255, 255, 255, .18),
+    inset 0 0 0 5px #070304,
+    0 60px 90px -30px rgba(42, 8, 16, .5),
+    0 20px 40px -20px rgba(42, 8, 16, .35);
+}
+.phone .screen { position: relative; width: 100%; height: 100%; overflow: hidden; border-radius: calc(var(--w) * .13); background: var(--wine-deep); }
+.phone .screen img { width: 100%; }
+.phone::after { /* Dynamic Island */
+  content: ""; position: absolute; top: calc(var(--w) * .058); left: 50%; width: calc(var(--w) * .28); height: calc(var(--w) * .078);
+  margin-left: calc(var(--w) * -.14); border-radius: 99px; background: #050203;
+}
+
+/* Фрагменти сайту (кроп скриншоту) */
+.shot {
+  overflow: hidden; border-radius: 20px; z-index: 6; background: var(--milk);
+  box-shadow: 0 0 0 1px rgba(75, 15, 28, .08), 0 40px 70px -28px rgba(42, 8, 16, .55), 0 12px 24px -12px rgba(42, 8, 16, .3);
+}
+.wine .shot, .deep .shot { box-shadow: 0 0 0 1px rgba(244, 235, 228, .12), 0 40px 70px -24px rgba(0, 0, 0, .7); }
+.shot img { width: var(--z, 100%); margin-left: calc((100% - var(--z, 100%)) / 2); transform: translateY(calc(var(--y, 0) * -1)); }
+
+/* Тонка «золота» лінія */
+.hair { height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); opacity: .8; }
+
+/* Бейдж «Готовність» */
+.badge { display: flex; align-items: center; gap: 22px; white-space: nowrap; }
+.badge .label { font-size: 14px; letter-spacing: .32em; text-transform: uppercase; }
+.badge .value { font-family: var(--f-display); font-weight: 300; font-size: 54px; line-height: 1; }
+.badge .sep { width: 44px; height: 1px; background: var(--gold); }
+.wine .badge .label, .deep .badge .label { color: var(--on-wine-muted); }
+
+/* ─────────────── СЛАЙД 1 ─────────────── */
+.s1 .events { list-style: none; font-size: 16px; letter-spacing: .3em; text-transform: uppercase; color: var(--on-wine-muted); line-height: 2.5; }
+.s1 .events li::before { content: ""; display: inline-block; width: 5px; height: 5px; margin: 0 18px 3px 0; border: 1px solid var(--gold); transform: rotate(45deg); }
+.s1 .badge { padding: 20px 34px; border: 1px solid var(--on-wine-line); border-radius: 99px; background: rgba(23, 5, 10, .25); backdrop-filter: blur(6px); z-index: 12; }
+.s1 .badge .value { font-size: 44px; }
+.s1 .glow { border-radius: 50%; background: radial-gradient(circle, rgba(233, 207, 203, .16), transparent 65%); z-index: 1; }
+
+.post .s1 .logo { left: 96px; top: 96px; width: 96px; height: 96px; }
+.post .s1 .page { right: 96px; top: 136px; }
+.post .s1 .title { left: 96px; top: 240px; width: 900px; font-size: 88px; }
+.post .s1 .lead { left: 96px; top: 452px; width: 420px; font-size: 26px; }
+.post .s1 .hair { left: 96px; top: 588px; width: 120px; }
+.post .s1 .events { left: 96px; top: 626px; }
+.post .s1 .phone { --w: 372px; left: 594px; top: 520px; transform: rotate(3deg); }
+.post .s1 .glow { left: 420px; top: 460px; width: 760px; height: 760px; }
+.post .s1 .shot { left: 318px; top: 960px; width: 280px; height: 300px; transform: rotate(-5deg); }
+.post .s1 .badge { left: 96px; top: 856px; }
+
+.square .s1 .logo { left: 90px; top: 88px; width: 84px; height: 84px; }
+.square .s1 .page { right: 90px; top: 124px; }
+.square .s1 .title { left: 90px; top: 206px; width: 900px; font-size: 74px; }
+.square .s1 .lead { left: 90px; top: 386px; width: 400px; font-size: 23px; }
+.square .s1 .hair { left: 90px; top: 500px; width: 110px; }
+.square .s1 .events { left: 90px; top: 530px; font-size: 14px; line-height: 2.35; }
+.square .s1 .phone { --w: 330px; left: 640px; top: 430px; transform: rotate(3deg); }
+.square .s1 .glow { left: 470px; top: 380px; width: 640px; height: 640px; }
+.square .s1 .shot { left: 488px; top: 616px; width: 230px; height: 250px; transform: rotate(-5deg); }
+.square .s1 .badge { left: 90px; top: 880px; padding: 16px 28px; }
+.square .s1 .badge .value { font-size: 38px; }
+
+.story .s1 .logo { left: 50%; top: 210px; width: 112px; height: 112px; margin-left: -56px; }
+.story .s1 .title { left: 90px; top: 400px; width: 900px; font-size: 100px; text-align: center; }
+.story .s1 .lead { left: 190px; top: 740px; width: 700px; font-size: 30px; text-align: center; }
+.story .s1 .hair { left: 480px; top: 850px; width: 120px; }
+.story .s1 .events { left: 90px; top: 880px; width: 900px; text-align: center; font-size: 15px; line-height: 2.2; }
+.story .s1 .events li { display: inline; margin: 0 14px; }
+.story .s1 .events li::before { margin-right: 12px; }
+.story .s1 .phone { --w: 440px; left: 380px; top: 1110px; transform: rotate(3deg); }
+.story .s1 .glow { left: 140px; top: 960px; width: 900px; height: 900px; }
+.story .s1 .shot { left: 120px; top: 1290px; width: 300px; height: 330px; transform: rotate(-5deg); }
+.story .s1 .badge { left: 50%; top: 972px; transform: translateX(-50%); }
+
+/* ─────────────── СЛАЙД 2 ─────────────── */
+.s2 .caption { font-family: var(--f-display); font-style: italic; font-weight: 400; color: var(--wine-soft); }
+.s2 .note { font-size: 14px; letter-spacing: .28em; text-transform: uppercase; color: var(--on-milk-muted); }
+.s2 .tag { z-index: 12; font-size: 12px; letter-spacing: .28em; text-transform: uppercase; color: var(--on-milk-muted); display: flex; align-items: center; gap: 12px; }
+.s2 .tag::before { content: ""; width: 28px; height: 1px; background: var(--gold); }
+
+.post .s2 .eyebrow { left: 0; right: 0; top: 104px; }
+.post .s2 .page { right: 96px; top: 104px; }
+.post .s2 .title { left: 90px; top: 150px; width: 900px; font-size: 80px; }
+.post .s2 .caption { left: 0; right: 0; top: 340px; font-size: 30px; }
+.post .s2 .phone { --w: 322px; left: 379px; top: 430px; }
+.post .s2 .a { left: 92px; top: 450px; width: 290px; height: 390px; transform: rotate(-4deg); }
+.post .s2 .b { left: 116px; top: 880px; width: 292px; height: 300px; transform: rotate(2.5deg); z-index: 11; }
+.post .s2 .c { left: 690px; top: 440px; width: 300px; height: 250px; transform: rotate(3.5deg); z-index: 11; }
+.post .s2 .d { left: 676px; top: 740px; width: 300px; height: 290px; transform: rotate(-2deg); }
+.post .s2 .e { left: 700px; top: 1070px; width: 280px; height: 150px; transform: rotate(2deg); }
+.post .s2 .note { left: 0; right: 0; top: 1252px; font-size: 13px; }
+
+.square .s2 .eyebrow { left: 0; right: 0; top: 92px; }
+.square .s2 .page { right: 90px; top: 92px; }
+.square .s2 .title { left: 60px; top: 134px; width: 960px; font-size: 62px; }
+.square .s2 .caption { left: 0; right: 0; top: 214px; font-size: 26px; }
+.square .s2 .phone { --w: 262px; left: 409px; top: 290px; }
+.square .s2 .a { left: 120px; top: 300px; width: 250px; height: 320px; transform: rotate(-4deg); }
+.square .s2 .b { left: 140px; top: 660px; width: 262px; height: 250px; transform: rotate(2.5deg); z-index: 11; }
+.square .s2 .c { left: 690px; top: 300px; width: 260px; height: 215px; transform: rotate(3.5deg); z-index: 11; }
+.square .s2 .d { left: 680px; top: 560px; width: 260px; height: 250px; transform: rotate(-2deg); }
+.square .s2 .e { display: none; }
+.square .s2 .note { left: 0; right: 0; top: 968px; font-size: 12px; }
+
+.story .s2 .eyebrow { left: 0; right: 0; top: 250px; }
+.story .s2 .title { left: 90px; top: 300px; width: 900px; font-size: 96px; }
+.story .s2 .caption { left: 0; right: 0; top: 530px; font-size: 34px; }
+.story .s2 .phone { --w: 372px; left: 354px; top: 680px; }
+.story .s2 .a { left: 70px; top: 690px; width: 320px; height: 430px; transform: rotate(-4deg); }
+.story .s2 .b { left: 96px; top: 1170px; width: 320px; height: 330px; transform: rotate(2.5deg); z-index: 11; }
+.story .s2 .c { left: 700px; top: 690px; width: 330px; height: 275px; transform: rotate(3.5deg); z-index: 11; }
+.story .s2 .d { left: 704px; top: 1010px; width: 316px; height: 320px; transform: rotate(-2deg); }
+.story .s2 .e { left: 716px; top: 1380px; width: 310px; height: 166px; transform: rotate(2deg); }
+.story .s2 .note { left: 120px; right: 120px; top: 1640px; font-size: 14px; line-height: 2; }
+
+/* ─────────────── СЛАЙД 3 ─────────────── */
+.s3 .feat { list-style: none; display: grid; }
+.s3 .feat li { display: grid; align-items: center; gap: 20px; font-family: var(--f-display); font-weight: 400; line-height: 1.12; }
+.s3 .feat.l li { grid-template-columns: 1fr auto; text-align: right; }
+.s3 .feat.r li { grid-template-columns: auto 1fr; }
+.s3 .feat.l li svg { order: 2; }
+.s3 .ic { width: var(--ic, 58px); height: var(--ic, 58px); padding: 14px; border: 1px solid var(--on-wine-line); border-radius: 50%; color: var(--powder); overflow: visible; }
+.s3 .ic * { fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
+.s3 .phone .screen img { transform: translateY(-35.6%); }
+
+.post .s3 .eyebrow { left: 0; right: 0; top: 104px; }
+.post .s3 .page { right: 96px; top: 104px; }
+.post .s3 .title { left: 90px; top: 150px; width: 900px; font-size: 76px; }
+.post .s3 .phone { --w: 300px; left: 390px; top: 380px; }
+.post .s3 .feat { top: 412px; width: 272px; row-gap: 42px; font-size: 29px; }
+.post .s3 .feat li { min-height: 116px; }
+.post .s3 .feat.l { left: 90px; }
+.post .s3 .feat.r { right: 90px; }
+.post .s3 .hair { left: 190px; top: 1100px; width: 700px; }
+.post .s3 .badge { left: 0; right: 0; top: 1150px; justify-content: center; }
+
+.square .s3 .eyebrow { left: 0; right: 0; top: 92px; }
+.square .s3 .page { right: 90px; top: 92px; }
+.square .s3 .title { left: 60px; top: 128px; width: 960px; font-size: 52px; }
+.square .s3 .phone { --w: 230px; left: 425px; top: 282px; }
+.square .s3 .feat { top: 296px; width: 280px; row-gap: 22px; font-size: 25px; --ic: 50px; }
+.square .s3 .feat li { min-height: 104px; }
+.square .s3 .ic { padding: 12px; }
+.square .s3 .feat.l { left: 90px; }
+.square .s3 .feat.r { right: 90px; }
+.square .s3 .hair { display: none; }
+.square .s3 .badge { left: 0; right: 0; top: 900px; justify-content: center; }
+.square .s3 .badge .value { font-size: 46px; }
+
+.story .s3 .eyebrow { left: 0; right: 0; top: 250px; }
+.story .s3 .title { left: 90px; top: 300px; width: 900px; font-size: 92px; }
+.story .s3 .phone { --w: 340px; left: 370px; top: 580px; }
+.story .s3 .feat { top: 600px; width: 250px; row-gap: 40px; font-size: 30px; --ic: 62px; }
+.story .s3 .feat li { min-height: 150px; grid-template-columns: 1fr !important; justify-items: center; text-align: center !important; }
+.story .s3 .feat.l li svg { order: 0; }
+.story .s3 .feat.l { left: 82px; }
+.story .s3 .feat.r { right: 82px; }
+.story .s3 .hair { left: 190px; top: 1440px; width: 700px; }
+.story .s3 .badge { left: 0; right: 0; top: 1500px; justify-content: center; }
+.story .s3 .badge .value { font-size: 64px; }
+
+/* ─────────────── СЛАЙД 4 ─────────────── */
+.s4 .card { border: 1px solid var(--on-milk-line); background: rgba(255, 255, 255, .32); backdrop-filter: blur(4px); z-index: 8; }
+.s4 .card::before { content: ""; position: absolute; inset: 7px; border: 1px solid rgba(75, 15, 28, .07); pointer-events: none; }
+.s4 .name { font-family: var(--f-display); font-weight: 400; text-align: center; letter-spacing: .01em; }
+.s4 .rows { display: grid; }
+.s4 .row { display: grid; grid-template-columns: 170px 1fr; align-items: baseline; border-top: 1px solid var(--on-milk-line); }
+.s4 .row span { font-size: 13px; letter-spacing: .3em; text-transform: uppercase; color: var(--on-milk-muted); }
+.s4 .row b { font-family: var(--f-display); font-weight: 400; text-align: right; }
+.s4 .cta {
+  display: flex; align-items: center; justify-content: center; gap: 18px;
+  border-radius: 99px; background: var(--wine); color: var(--milk);
+  font-size: 17px; letter-spacing: .2em; text-transform: uppercase; font-weight: 400;
+  box-shadow: 0 24px 40px -20px rgba(75, 15, 28, .7); z-index: 8;
+}
+.s4 .cta svg { width: 26px; height: 12px; }
+.s4 .events { font-size: 13px; letter-spacing: .3em; text-transform: uppercase; color: var(--on-milk-muted); }
+.s4 .logo { color: var(--wine); }
+.s4 .rings { color: var(--wine); opacity: .06; fill: none; stroke: currentColor; stroke-width: .5; z-index: 0; }
+
+.post .s4 .logo { left: 468px; top: 96px; width: 144px; height: 144px; }
+.post .s4 .title { left: 90px; top: 290px; width: 900px; font-size: 78px; }
+.post .s4 .lead { left: 230px; top: 480px; width: 620px; font-size: 24px; }
+.post .s4 .card { left: 170px; top: 600px; width: 740px; padding: 40px 56px 22px; }
+.post .s4 .name { font-size: 46px; margin-bottom: 22px; }
+.post .s4 .row { padding: 18px 0; }
+.post .s4 .row b { font-size: 32px; }
+.post .s4 .cta { left: 170px; top: 1050px; width: 740px; height: 84px; }
+.post .s4 .events { left: 0; right: 0; top: 1200px; }
+.post .s4 .rings { left: 190px; top: 260px; width: 700px; }
+.post .s4 .phone { display: none; }
+
+.square .s4 .logo { left: 480px; top: 80px; width: 120px; height: 120px; }
+.square .s4 .title { left: 60px; top: 230px; width: 960px; font-size: 62px; }
+.square .s4 .lead { left: 250px; top: 380px; width: 580px; font-size: 21px; }
+.square .s4 .card { left: 200px; top: 480px; width: 680px; padding: 28px 48px 10px; }
+.square .s4 .name { font-size: 38px; margin-bottom: 12px; }
+.square .s4 .row { padding: 12px 0; }
+.square .s4 .row b { font-size: 27px; }
+.square .s4 .cta { left: 200px; top: 850px; width: 680px; height: 72px; font-size: 15px; }
+.square .s4 .events { left: 0; right: 0; top: 966px; font-size: 12px; }
+.square .s4 .rings { left: 240px; top: 180px; width: 600px; }
+.square .s4 .phone { display: none; }
+
+.story .s4 .logo { left: 450px; top: 230px; width: 180px; height: 180px; }
+.story .s4 .title { left: 90px; top: 480px; width: 900px; font-size: 94px; }
+.story .s4 .lead { left: 150px; top: 720px; width: 780px; font-size: 30px; }
+.story .s4 .card { left: 130px; top: 870px; width: 820px; padding: 48px 60px 26px; }
+.story .s4 .name { font-size: 54px; margin-bottom: 26px; }
+.story .s4 .row { padding: 22px 0; }
+.story .s4 .row b { font-size: 36px; }
+.story .s4 .cta { left: 130px; top: 1370px; width: 820px; height: 96px; font-size: 19px; }
+.story .s4 .events { left: 0; right: 0; top: 1530px; font-size: 14px; }
+.story .s4 .rings { left: 140px; top: 380px; width: 800px; }
+.story .s4 .phone { --w: 360px; left: 360px; top: 1640px; transform: rotate(-2deg); }
+</style>
+</head>
+<body class="post">
+
+<!-- 1. ОБКЛАДИНКА -->
+<section class="slide s1 wine">
+  <div class="frame"><i></i><i></i></div>
+  <div class="logo" data-logo="light"></div>
+  <p class="eyebrow page">01 — 04</p>
+  <h1 class="title" data-t="s1_title"></h1>
+  <p class="lead" data-t="s1_subtitle"></p>
+  <div class="hair"></div>
+  <ul class="events" data-list="events"></ul>
+  <div class="glow"></div>
+  <div class="phone"><div class="screen"><img src="shots/hero.png" alt=""></div></div>
+  <figure class="shot" style="--z:122%;--y:5.5%"><img src="shots/invite.png" alt=""></figure>
+  <div class="badge"><span class="label" data-t="s1_badge_label"></span><span class="sep"></span><span class="value" data-t="s1_badge_value"></span></div>
+</section>
+
+<!-- 2. ПОРТФОЛІО -->
+<section class="slide s2 milk">
+  <div class="frame"><i></i><i></i></div>
+  <p class="eyebrow center" data-t="s2_eyebrow"></p>
+  <p class="eyebrow page">02 — 04</p>
+  <h2 class="title center" data-t="s2_title"></h2>
+  <p class="caption center" data-t="s2_caption"></p>
+  <div class="phone"><div class="screen"><img src="shots/hero.png" alt=""></div></div>
+  <figure class="shot a" style="--z:118%;--y:5%"><img src="shots/invite.png" alt=""></figure>
+  <figure class="shot b" style="--y:2.5%"><img src="shots/rsvp.png" alt=""></figure>
+  <figure class="shot c" style="--z:112%;--y:7%"><img src="shots/day.png" alt=""></figure>
+  <figure class="shot d" style="--y:10%"><img src="shots/dress.png" alt=""></figure>
+  <figure class="shot e" style="--z:118%;--y:44.5%"><img src="shots/day.png" alt=""></figure>
+  <p class="note center" data-t="s2_note"></p>
+</section>
+
+<!-- 3. ЩО ОТРИМУЄ КЛІЄНТ -->
+<section class="slide s3 deep">
+  <div class="frame"><i></i><i></i></div>
+  <p class="eyebrow center" data-t="s3_eyebrow"></p>
+  <p class="eyebrow page">03 — 04</p>
+  <h2 class="title center" data-t="s3_title"></h2>
+  <ul class="feat l" data-feat="0,4"></ul>
+  <div class="phone"><div class="screen"><img src="shots/full.png" alt=""></div></div>
+  <ul class="feat r" data-feat="4,8"></ul>
+  <div class="hair"></div>
+  <div class="badge"><span class="label" data-t="s3_badge_label"></span><span class="sep"></span><span class="value" data-t="s3_badge_value"></span><span class="sep"></span></div>
+</section>
+
+<!-- 4. КОНТАКТИ -->
+<section class="slide s4 powder">
+  <div class="frame"><i></i><i></i></div>
+  <svg class="rings" viewBox="0 0 120 80" aria-hidden="true"><circle cx="46" cy="40" r="30"/><circle cx="74" cy="40" r="30"/></svg>
+  <div class="logo" data-logo="dark"></div>
+  <h2 class="title center" data-t="s4_title"></h2>
+  <p class="lead center" data-t="s4_text"></p>
+  <div class="card">
+    <p class="name" data-c="name"></p>
+    <div class="rows">
+      <p class="row"><span>Телефон</span><b data-c="phone"></b></p>
+      <p class="row"><span>Instagram</span><b data-c="instagram"></b></p>
+      <p class="row"><span>Email</span><b data-c="email"></b></p>
+    </div>
+  </div>
+  <p class="cta"><span data-t="s4_cta"></span><svg viewBox="0 0 26 12"><path d="M0 6h24M19 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></p>
+  <p class="events center" data-events-inline></p>
+  <div class="phone"><div class="screen"><img src="shots/finale.png" alt=""></div></div>
+</section>
+
+<script src="content.js"></script>
+<script>
+(function () {
+  var C = window.CONTENT;
+  var q = new URLSearchParams(location.search);
+  var fmt = q.get('f') || 'post';
+  document.body.className = fmt + (q.has('export') ? ' export' : '');
+
+  var ICONS = {
+    names: '<circle cx="11" cy="16" r="7"/><circle cx="21" cy="16" r="7"/>',
+    place: '<path d="M16 29s9-8.6 9-15.5A9 9 0 0 0 7 13.5C7 20.4 16 29 16 29z"/><circle cx="16" cy="13.5" r="3.2"/>',
+    program: '<circle cx="16" cy="16" r="12"/><path d="M16 9v7l5 3"/>',
+    gallery: '<rect x="4" y="7" width="24" height="18" rx="2"/><circle cx="11" cy="13" r="2.2"/><path d="M4 22l7-6 5 4 4-3 8 6"/>',
+    map: '<path d="M4 8l8-3 8 3 8-3v19l-8 3-8-3-8 3z"/><path d="M12 5v19M20 8v19"/>',
+    dress: '<path d="M16 9a2.5 2.5 0 1 1 2.5-2.5M16 9v2L4 20.5c-1 .8-.5 2 .7 2h22.6c1.2 0 1.7-1.2.7-2L16 11"/>',
+    rsvp: '<rect x="4" y="8" width="24" height="17" rx="2"/><path d="M4 10l12 8 12-8"/><path d="M20 27l3 2.5 6-6" transform="translate(-2 -4)"/>',
+    info: '<circle cx="16" cy="16" r="12"/><path d="M16 14.5V22M16 10v.5"/>'
+  };
+
+  document.querySelectorAll('[data-t]').forEach(function (el) { el.innerHTML = C[el.dataset.t] || ''; });
+  document.querySelectorAll('[data-c]').forEach(function (el) { el.textContent = C.contacts[el.dataset.c] || ''; });
+  document.querySelectorAll('[data-list]').forEach(function (el) {
+    el.innerHTML = C[el.dataset.list].map(function (t) { return '<li>' + t + '</li>'; }).join('');
+  });
+  document.querySelectorAll('[data-events-inline]').forEach(function (el) { el.textContent = C.events.join('  ·  '); });
+  document.querySelectorAll('[data-feat]').forEach(function (el) {
+    var r = el.dataset.feat.split(',').map(Number);
+    el.innerHTML = C.features.slice(r[0], r[1]).map(function (f) {
+      return '<li><svg class="ic" viewBox="0 0 32 32">' + ICONS[f[0]] + '</svg><span>' + f[1] + '</span></li>';
+    }).join('');
+  });
+  document.querySelectorAll('[data-logo]').forEach(function (el) {
+    var src = el.dataset.logo === 'light' ? (C.logoLight || C.logo) : C.logo;
+    if (src) el.innerHTML = '<img src="' + src + '" alt="Логотип">';
+    else el.classList.add('empty');
+  });
+})();
+</script>
+</body>
+</html>
