@@ -1,0 +1,746 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Карусель для Instagram · Сайти-запрошення</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- crossorigin потрібен, щоб шрифти потрапили в експортовані PNG -->
+<link rel="stylesheet" crossorigin="anonymous" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap">
+<style>
+/* =====================================================================
+   ПАЛІТРА І ШРИФТИ — змінюються тут, діють на всі слайди
+   ===================================================================== */
+:root {
+  --wine-ink:  #1E060C;   /* найглибший бордовий */
+  --wine-deep: #2E0A13;   /* глибокий бордовий */
+  --wine:      #4B0F1C;   /* основний бордовий */
+  --wine-soft: #6E1A2C;   /* винний */
+  --milk:      #F6EEE7;   /* молочний */
+  --cream:     #EADBCC;   /* кремовий */
+  --cream-2:   #E2CFBD;
+  --gold:      #C3A06E;   /* делікатне золото */
+  --gold-soft: #D9C29C;
+
+  --on-milk:       #3B0A15;
+  --on-milk-muted: rgba(59, 10, 21, .72);
+  --on-wine:       #F6EEE7;
+  --on-wine-muted: rgba(246, 238, 231, .76);
+
+  --f-serif: "Cormorant Garamond", "Cormorant", Georgia, "Times New Roman", serif;
+  --f-sans:  "Jost", "Helvetica Neue", Arial, sans-serif;
+}
+
+/* =====================================================================
+   ПЕРЕГЛЯДАЧ (інтерфейс навколо слайдів, у PNG не потрапляє)
+   ===================================================================== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #161012; color: #EFE6E0; font-family: var(--f-sans); font-weight: 300; }
+body.viewer { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
+button, label.btn { font: inherit; }
+
+.bar {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px;
+  padding: 12px 16px; background: rgba(22, 16, 18, .92); backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(239, 230, 224, .1);
+}
+.bar h1 { font: 500 14px/1.2 var(--f-sans); letter-spacing: .18em; text-transform: uppercase; color: var(--gold-soft); margin-right: auto; }
+.bar .group { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+  padding: 9px 14px; border-radius: 999px; font-size: 14px; font-weight: 400; color: #EFE6E0;
+  background: transparent; border: 1px solid rgba(239, 230, 224, .22); transition: background .2s, border-color .2s;
+}
+.btn:hover { border-color: var(--gold-soft); }
+.btn.primary { background: var(--gold-soft); color: #2A0810; border-color: var(--gold-soft); font-weight: 500; }
+.btn.primary:hover { background: #E7D4B3; }
+.btn[aria-pressed="true"] { background: rgba(217, 194, 156, .16); border-color: var(--gold-soft); }
+.btn:disabled { opacity: .5; cursor: progress; }
+
+.stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 16px; min-height: 0; }
+.slides { display: flex; justify-content: center; width: 100%; }
+.holder { position: relative; flex: none; overflow: hidden; border-radius: 6px; box-shadow: 0 20px 60px -20px rgba(0,0,0,.7); }
+.holder > .slide { position: absolute; top: 0; left: 0; transform-origin: 0 0; }
+
+/* режим каруселі: видно один слайд */
+body.mode-carousel .holder { display: none; }
+body.mode-carousel .holder.active { display: block; }
+.nav { display: flex; align-items: center; gap: 14px; }
+.nav .arrow { width: 44px; height: 44px; justify-content: center; padding: 0; font-size: 20px; }
+.dots { display: flex; gap: 8px; }
+.dots button { width: 9px; height: 9px; border-radius: 50%; border: 0; background: rgba(239,230,224,.28); cursor: pointer; padding: 0; }
+.dots button.on { background: var(--gold-soft); }
+.counter { font-size: 13px; letter-spacing: .14em; color: rgba(239,230,224,.6); min-width: 52px; text-align: center; }
+
+/* режим «усі слайди» */
+body.mode-grid .slides { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); gap: 22px; max-width: 1500px; }
+body.mode-grid .holder { width: 100%; aspect-ratio: 1080 / 1350; height: auto !important; cursor: zoom-in; }
+body.mode-grid .nav { display: none; }
+.holder .tag { display: none; }
+body.mode-grid .holder .tag {
+  display: block; position: absolute; left: 10px; bottom: 10px; z-index: 3; padding: 4px 10px; border-radius: 999px;
+  background: rgba(22,16,18,.75); color: #EFE6E0; font-size: 12px; letter-spacing: .12em;
+}
+
+@media (max-width: 600px) {
+  .bar { padding: 10px 12px; }
+  .btn { padding: 7px 11px; font-size: 13px; }
+}
+.hint { font-size: 13px; color: rgba(239,230,224,.55); text-align: center; max-width: 640px; line-height: 1.5; }
+.toast {
+  position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 50; max-width: min(92vw, 560px);
+  padding: 12px 18px; border-radius: 12px; background: #2A1C20; border: 1px solid rgba(217,194,156,.35);
+  font-size: 14px; line-height: 1.5; display: none;
+}
+.toast.show { display: block; }
+
+/* панелі «Скриншоти» і «Тексти» */
+dialog {
+  width: min(94vw, 640px); max-height: 88vh; margin: auto; padding: 0; border: 1px solid rgba(239,230,224,.14);
+  border-radius: 16px; background: #1F1619; color: #EFE6E0;
+}
+dialog::backdrop { background: rgba(0,0,0,.6); }
+.dlg-head { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid rgba(239,230,224,.1); position: sticky; top: 0; background: #1F1619; }
+.dlg-head h2 { font: 500 20px/1.2 var(--f-serif); font-size: 24px; }
+.dlg-body { padding: 16px 20px 22px; display: grid; gap: 14px; font-size: 14px; line-height: 1.55; }
+.dlg-body p.note { color: rgba(239,230,224,.65); }
+.slot { display: grid; grid-template-columns: 56px 1fr auto; gap: 12px; align-items: center; padding: 10px; border: 1px solid rgba(239,230,224,.1); border-radius: 12px; }
+.slot img { width: 56px; height: 100px; object-fit: cover; object-position: top; border-radius: 8px; background: #333; }
+.slot b { font-weight: 500; display: block; }
+.slot small { color: rgba(239,230,224,.55); font-size: 12px; }
+.slot input { display: none; }
+.copybox { border: 1px solid rgba(239,230,224,.12); border-radius: 12px; padding: 14px; }
+.copybox h3 { font: 500 13px var(--f-sans); letter-spacing: .14em; text-transform: uppercase; color: var(--gold-soft); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.copybox pre { white-space: pre-wrap; font: 300 14px/1.6 var(--f-sans); }
+
+/* режим одного слайда 1:1 (?slide=1 … ?slide=5) — для збереження та скриншотів */
+body.solo { background: #fff; }
+body.solo .bar, body.solo .nav, body.solo .hint, body.solo dialog, body.solo .toast { display: none !important; }
+body.solo .stage { padding: 0; display: block; }
+body.solo .slides { display: block; }
+body.solo .holder { display: none; border-radius: 0; box-shadow: none; width: 1080px !important; height: 1350px !important; }
+body.solo .holder.active { display: block; }
+body.solo .holder > .slide { transform: none !important; }
+
+/* =====================================================================
+   СЛАЙД — базова сітка 1080 × 1350
+   ===================================================================== */
+.slide {
+  width: 1080px; height: 1350px; overflow: hidden; position: relative;
+  font-family: var(--f-sans); font-weight: 300; color: var(--on-milk); background: var(--milk);
+  -webkit-font-smoothing: antialiased;
+}
+.slide.dark { color: var(--on-wine); }
+.s-top {
+  position: absolute; top: 58px; left: 80px; right: 80px; z-index: 5;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 22px; font-weight: 400; letter-spacing: .3em; text-transform: uppercase;
+}
+.s-top .brand { display: flex; align-items: center; gap: 16px; }
+.s-top .brand::before { content: ""; width: 40px; height: 1px; background: var(--gold); }
+.s-top .num { font-family: var(--f-serif); font-size: 28px; letter-spacing: .12em; font-weight: 500; }
+.slide.dark .s-top { color: var(--on-wine-muted); }
+.slide:not(.dark) .s-top { color: var(--on-milk-muted); }
+
+.kicker { font-size: 24px; font-weight: 400; letter-spacing: .32em; text-transform: uppercase; color: var(--wine-soft); }
+.slide.dark .kicker { color: var(--gold-soft); }
+.h { font-family: var(--f-serif); font-weight: 500; line-height: 1.02; letter-spacing: -.005em; }
+.h em { font-style: italic; font-weight: 400; color: var(--wine-soft); }
+.slide.dark .h em { color: var(--gold-soft); }
+.lead { font-size: 33px; line-height: 1.45; color: var(--on-milk-muted); }
+.slide.dark .lead { color: var(--on-wine-muted); }
+.rule { width: 72px; height: 1px; background: var(--gold); }
+
+.swipe {
+  position: absolute; right: 80px; bottom: 60px; z-index: 5;
+  display: flex; align-items: center; gap: 16px;
+  font-size: 20px; font-weight: 400; letter-spacing: .3em; text-transform: uppercase; color: var(--on-milk-muted);
+}
+.slide.dark .swipe { color: var(--on-wine-muted); }
+.swipe svg { width: 60px; height: 14px; }
+
+/* =====================================================================
+   МОКАП СМАРТФОНА (розмір задається width; усе інше масштабується саме)
+   ===================================================================== */
+.phone {
+  --w: 400px; position: absolute; width: var(--w); height: calc(var(--w) * 19.5 / 9);
+  border-radius: calc(var(--w) * .155); padding: calc(var(--w) * .031);
+  background: linear-gradient(145deg, #3A3134 0%, #151012 38%, #0E0A0B 62%, #2C2427 100%);
+  box-shadow:
+    inset 0 0 0 calc(var(--w) * .005) #4A4044,
+    inset 0 0 0 calc(var(--w) * .01) #0B0809,
+    0 50px 90px -40px rgba(30, 6, 12, .55),
+    0 18px 34px -18px rgba(30, 6, 12, .35);
+}
+.slide.dark .phone { box-shadow: inset 0 0 0 calc(var(--w) * .005) #5A4F53, inset 0 0 0 calc(var(--w) * .01) #0B0809, 0 50px 90px -30px rgba(0,0,0,.6); }
+.phone::before, .phone::after { content: ""; position: absolute; width: calc(var(--w) * .009); border-radius: 2px; background: #2A2225; }
+.phone::before { left: calc(var(--w) * -.007); top: 22%; height: 11%; }
+.phone::after  { right: calc(var(--w) * -.007); top: 27%; height: 16%; }
+.screen { position: relative; width: 100%; height: 100%; border-radius: calc(var(--w) * .126); overflow: hidden; background: #2A0810; }
+.screen img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+.island { position: absolute; top: calc(var(--w) * .028); left: 50%; transform: translateX(-50%); width: 31%; height: calc(var(--w) * .085); border-radius: 99px; background: #050304; z-index: 2; }
+
+/* =====================================================================
+   СЛАЙД 1 — ГОЛОВНИЙ
+   ===================================================================== */
+.s1 { background: radial-gradient(ellipse 70% 60% at 25% 30%, #FBF6F1 0%, var(--milk) 60%, #EFE4DA 100%); }
+.s1 .arch {
+  position: absolute; left: 532px; top: 168px; width: 500px; height: 1260px;
+  border-radius: 250px 250px 0 0; background: linear-gradient(180deg, var(--cream) 0%, #E5D3C2 100%);
+}
+.s1 .arch::after { content: ""; position: absolute; inset: 20px 20px -20px; border: 1.5px solid rgba(195, 160, 110, .7); border-radius: 230px 230px 0 0; }
+.s1 .phone { --w: 420px; left: 572px; top: 300px; z-index: 2; }
+.s1 .copy { position: absolute; left: 80px; top: 300px; width: 470px; z-index: 3; }
+.s1 .h { font-size: 94px; }
+.s1 .h span { display: block; }
+.s1 .rule { margin: 54px 0 40px; }
+.nw { white-space: nowrap; }
+.s1 .lead { font-size: 35px; color: var(--on-milk); max-width: 400px; }
+.s1 .events { margin-top: 44px; font-size: 21px; font-weight: 400; letter-spacing: .22em; text-transform: uppercase; line-height: 2; color: var(--wine-soft); }
+
+/* =====================================================================
+   СЛАЙД 2 — ПРИКЛАД САЙТУ
+   ===================================================================== */
+.s2 { background: linear-gradient(180deg, var(--cream) 0%, #E6D5C5 100%); }
+.s2 .copy { position: absolute; top: 160px; left: 90px; right: 90px; text-align: center; }
+.s2 .h { font-size: 84px; margin: 26px 0 26px; }
+.s2 .lead { max-width: 820px; margin: 0 auto; font-size: 32px; }
+.s2 .phone.p-left  { --w: 270px; left: 150px; top: 640px; transform: rotate(-5deg); z-index: 1; }
+.s2 .phone.p-mid   { --w: 300px; left: 390px; top: 580px; z-index: 3; }
+.s2 .phone.p-right { --w: 270px; left: 660px; top: 640px; transform: rotate(5deg); z-index: 1; }
+.s2 .caps { position: absolute; left: 0; right: 0; top: 1240px; display: flex; justify-content: center; gap: 0; z-index: 4; }
+.s2 .caps span {
+  width: 300px; text-align: center; font-size: 20px; font-weight: 400; letter-spacing: .28em; text-transform: uppercase; color: var(--on-milk-muted);
+}
+
+/* =====================================================================
+   СЛАЙД 3 — ДЛЯ РІЗНИХ ПОДІЙ (концепції стилів)
+   ===================================================================== */
+.s3 { background: radial-gradient(ellipse 90% 70% at 20% 0%, var(--wine-soft) 0%, var(--wine) 45%, var(--wine-deep) 100%); }
+.s3 .copy { position: absolute; top: 160px; left: 80px; right: 80px; text-align: center; }
+.s3 .h { font-size: 84px; margin: 26px 0 30px; }
+.s3 .events { font-size: 30px; font-weight: 400; letter-spacing: .04em; color: var(--on-wine); }
+.s3 .events i { font-style: normal; color: var(--gold); padding: 0 .45em; }
+.s3 .cards { position: absolute; left: 70px; right: 70px; top: 610px; display: flex; justify-content: space-between; }
+.s3 .card { width: 222px; display: flex; flex-direction: column; gap: 18px; align-items: center; }
+.s3 .card:nth-child(even) { margin-top: 56px; }
+.s3 .card .label { font-size: 20px; font-weight: 400; letter-spacing: .24em; text-transform: uppercase; color: var(--on-wine-muted); }
+.s3 .mini {
+  width: 222px; height: 420px; border-radius: 26px; overflow: hidden; position: relative;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 14px;
+  padding: 26px 18px; box-shadow: 0 30px 60px -30px rgba(0,0,0,.55);
+}
+.mini::before { content: ""; position: absolute; inset: 12px; border: 1px solid currentColor; opacity: .28; border-radius: 18px; pointer-events: none; }
+.mini .t { font-size: 15px; font-weight: 400; letter-spacing: .26em; text-transform: uppercase; opacity: .8; }
+.mini .big { font-family: var(--f-serif); font-weight: 500; line-height: 1; }
+.mini .it { font-family: var(--f-serif); font-style: italic; font-size: 25px; line-height: 1.15; }
+.mini .ln { width: 36px; height: 1px; background: currentColor; opacity: .5; }
+.mini .d { font-size: 15px; letter-spacing: .22em; opacity: .75; }
+.mini svg { width: 70px; height: 46px; fill: none; stroke: currentColor; stroke-width: 1.4; }
+/* 1 — весілля: молочний, бордова типографіка */
+.mini.m1 { background: var(--milk); color: var(--wine); }
+.mini.m1 .big { font-size: 46px; }
+.mini.m1 svg { color: var(--gold); stroke: var(--gold); }
+/* 2 — хрестини: кремовий з аркою */
+.mini.m2 { background: linear-gradient(180deg, #F3E9DF, var(--cream)); color: var(--wine-soft); }
+.mini.m2 .archy { width: 120px; height: 150px; border-radius: 60px 60px 0 0; border: 1px solid var(--gold); display: grid; place-items: center; }
+.mini.m2 .archy span { font-family: var(--f-serif); font-style: italic; font-size: 30px; line-height: 1.05; }
+/* 3 — день народження: винний, велике число */
+.mini.m3 { background: var(--wine-soft); color: var(--milk); }
+.mini.m3 .big { font-size: 130px; font-style: italic; font-weight: 400; color: var(--gold-soft); }
+/* 4 — ювілей: глибокий бордовий і золото */
+.mini.m4 { background: var(--wine-ink); color: var(--gold-soft); }
+.mini.m4 .big { font-size: 110px; color: var(--gold); }
+.mini.m4::after { content: ""; position: absolute; inset: 20px; border: 1px solid var(--gold); opacity: .4; border-radius: 12px; }
+.s3 .more { position: absolute; left: 80px; right: 80px; top: 1180px; text-align: center; }
+.s3 .more p { font-family: var(--f-serif); font-style: italic; font-size: 42px; line-height: 1.2; color: var(--on-wine); }
+
+/* =====================================================================
+   СЛАЙД 4 — ПЕРЕВАГИ
+   ===================================================================== */
+.s4 { background: radial-gradient(ellipse 80% 60% at 85% 20%, #FBF6F1 0%, var(--milk) 55%, #EFE3D8 100%); }
+.s4 .copy { position: absolute; top: 160px; left: 80px; right: 80px; }
+.s4 .h { font-size: 84px; margin: 26px 0 28px; }
+.s4 .lead { font-size: 32px; max-width: 860px; }
+.s4 .phone { --w: 330px; left: 110px; top: 560px; }
+.s4 .link {
+  position: absolute; left: 64px; top: 1196px; z-index: 4; display: flex; align-items: center; gap: 16px;
+  padding: 20px 30px 20px 22px; border-radius: 999px; background: #fff; color: var(--wine);
+  font-size: 24px; font-weight: 400; box-shadow: 0 20px 40px -20px rgba(46, 10, 19, .45);
+}
+.s4 .link .ic { width: 50px; height: 50px; border-radius: 50%; background: var(--wine); display: grid; place-items: center; }
+.s4 .link svg { width: 26px; height: 26px; stroke: var(--milk); fill: none; stroke-width: 2; stroke-linecap: round; }
+.s4 .feats { position: absolute; left: 520px; right: 80px; top: 572px; list-style: none; }
+.s4 .feats li { display: grid; grid-template-columns: 62px 1fr; padding: 22px 0 22px; border-top: 1px solid rgba(75, 15, 28, .16); }
+.s4 .feats li:last-child { border-bottom: 1px solid rgba(75, 15, 28, .16); }
+.s4 .feats .n { font-family: var(--f-serif); font-size: 30px; font-style: italic; color: var(--gold); line-height: 1.3; }
+.s4 .feats b { display: block; font-family: var(--f-serif); font-weight: 500; font-size: 38px; line-height: 1.1; color: var(--on-milk); }
+.s4 .feats span { display: block; margin-top: 6px; font-size: 23px; line-height: 1.4; color: var(--on-milk-muted); }
+.s4 .note { position: absolute; left: 520px; right: 80px; top: 1100px; font-family: var(--f-serif); font-style: italic; font-size: 28px; line-height: 1.3; color: var(--wine-soft); }
+
+/* =====================================================================
+   СЛАЙД 5 — ЗАКЛИК ДО ДІЇ
+   ===================================================================== */
+.s5 { background: radial-gradient(ellipse 80% 60% at 50% 0%, var(--wine-soft) 0%, var(--wine) 40%, var(--wine-deep) 78%, var(--wine-ink) 100%); }
+.s5 .frame { position: absolute; inset: 40px; border: 1px solid rgba(217, 194, 156, .45); pointer-events: none; }
+.s5 .frame::before, .s5 .frame::after {
+  content: ""; position: absolute; left: 50%; width: 12px; height: 12px; border: 1px solid var(--gold-soft);
+  background: var(--wine-deep); transform: translateX(-50%) rotate(45deg);
+}
+.s5 .frame::before { top: -7px; } .s5 .frame::after { bottom: -7px; }
+.s5 .s-top { top: 86px; left: 100px; right: 100px; }
+.s5 .center { position: absolute; left: 100px; right: 100px; top: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.s5 .rings { width: 128px; height: 86px; fill: none; stroke: var(--gold-soft); stroke-width: 1.2; margin-bottom: 40px; }
+.s5 .h { font-size: 108px; line-height: 1; }
+.s5 .rule { margin: 54px auto 46px; }
+.s5 .lead { font-size: 36px; max-width: 760px; color: var(--on-wine-muted); }
+.s5 .cta {
+  margin-top: 72px; display: inline-flex; align-items: center; gap: 20px;
+  padding: 30px 56px; border-radius: 999px; background: var(--milk); color: var(--wine);
+  font-size: 28px; font-weight: 500; letter-spacing: .2em; text-transform: uppercase;
+}
+.s5 .cta svg { width: 34px; height: 34px; fill: none; stroke: var(--wine); stroke-width: 1.8; stroke-linejoin: round; }
+.s5 .handle { margin-top: 30px; font-size: 28px; letter-spacing: .08em; color: var(--gold-soft); }
+.s5 .handle:empty { display: none; }
+.s5 .events { position: absolute; left: 100px; right: 100px; bottom: 96px; text-align: center; font-size: 20px; font-weight: 400; letter-spacing: .3em; text-transform: uppercase; color: rgba(217, 194, 156, .8); }
+</style>
+</head>
+<body class="viewer mode-carousel">
+
+<header class="bar">
+  <h1>Карусель · 5 слайдів</h1>
+  <div class="group">
+    <button class="btn" id="btn-carousel" aria-pressed="true">Карусель</button>
+    <button class="btn" id="btn-grid" aria-pressed="false">Усі слайди</button>
+    <button class="btn" id="btn-shots">Скриншоти</button>
+    <button class="btn" id="btn-texts">Тексти</button>
+  </div>
+  <div class="group">
+    <button class="btn" id="btn-png">PNG цього слайда</button>
+    <button class="btn primary" id="btn-png-all">Зберегти всі 5 PNG</button>
+  </div>
+</header>
+
+<main class="stage" id="stage">
+  <div class="slides" id="slides">
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     СЛАЙД 1 — ГОЛОВНИЙ
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="holder"><span class="tag">01</span>
+<section class="slide s1" data-name="01-golovnyi">
+  <div class="s-top"><span class="brand" data-brand>Сайти-запрошення</span><span class="num">01 / 05</span></div>
+  <div class="copy">
+    <h2 class="h">
+      <span>Ваше свято.</span>
+      <span>Ваш стиль.</span>
+      <span><em>Ваше</em></span>
+      <span><em>запрошення.</em></span>
+    </h2>
+    <div class="rule"></div>
+    <p class="lead">Персональні <span class="nw">сайти-запрошення</span> для особливих подій</p>
+    <p class="events">Весілля · Хрестини<br>Дні народження · Ювілеї</p>
+  </div>
+  <div class="arch"></div>
+  <div class="phone"><div class="screen">
+    <img data-slot="hero" alt="">
+    <div class="island"></div>
+  </div></div>
+  <div class="swipe">Гортайте <svg viewBox="0 0 60 14"><path d="M0 7h58M51 1l7 6-7 6" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></div>
+</section>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     СЛАЙД 2 — ПРИКЛАД САЙТУ (реальний сайт: скриншоти в папці img/)
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="holder"><span class="tag">02</span>
+<section class="slide s2" data-name="02-pryklad-saitu">
+  <div class="s-top"><span class="brand" data-brand>Сайти-запрошення</span><span class="num">02 / 05</span></div>
+  <div class="copy">
+    <p class="kicker">Приклад сайту · весілля</p>
+    <h2 class="h">Не просто запрошення,<br>а ціла <em>історія</em></h2>
+    <p class="lead">Персональний дизайн, важливі деталі та атмосфера вашої події — в одному сайті</p>
+  </div>
+  <div class="phone p-left"><div class="screen"><img data-slot="invite" alt=""><div class="island"></div></div></div>
+  <div class="phone p-mid"><div class="screen"><img data-slot="hero" alt=""><div class="island"></div></div></div>
+  <div class="phone p-right"><div class="screen"><img data-slot="day" alt=""><div class="island"></div></div></div>
+  <div class="caps"><span>Запрошення</span><span>Обкладинка</span><span>Деталі</span></div>
+</section>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     СЛАЙД 3 — ДЛЯ РІЗНИХ ПОДІЙ (концепції стилів, не виконані замовлення)
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="holder"><span class="tag">03</span>
+<section class="slide s3 dark" data-name="03-podii">
+  <div class="s-top"><span class="brand" data-brand>Сайти-запрошення</span><span class="num">03 / 05</span></div>
+  <div class="copy">
+    <p class="kicker">Концепції стилів</p>
+    <h2 class="h">Для моментів, які<br>хочеться <em>пам’ятати</em></h2>
+    <p class="events">Весілля<i>•</i>Хрестини<i>•</i>День народження<i>•</i>Ювілей</p>
+  </div>
+  <div class="cards">
+    <div class="card">
+      <div class="mini m1">
+        <span class="t">Весілля</span>
+        <svg viewBox="0 0 120 80"><circle cx="46" cy="40" r="28"/><circle cx="74" cy="40" r="28"/></svg>
+        <span class="big">Ваші<br>імена</span>
+        <span class="ln"></span>
+        <span class="d">ДАТА · МІСЦЕ</span>
+      </div>
+      <span class="label">Класика</span>
+    </div>
+    <div class="card">
+      <div class="mini m2">
+        <span class="t">Хрестини</span>
+        <div class="archy"><span>Маленьке<br>диво</span></div>
+        <span class="it">Ім’я малюка</span>
+        <span class="d">ДАТА</span>
+      </div>
+      <span class="label">Ніжність</span>
+    </div>
+    <div class="card">
+      <div class="mini m3">
+        <span class="t">День народження</span>
+        <span class="big">30</span>
+        <span class="it">Святкуймо<br>разом</span>
+        <span class="ln"></span>
+        <span class="d">ДАТА · ЧАС</span>
+      </div>
+      <span class="label">Вечірка</span>
+    </div>
+    <div class="card">
+      <div class="mini m4">
+        <span class="t">Ювілей</span>
+        <span class="big">50</span>
+        <span class="it">Золота<br>дата</span>
+        <span class="ln"></span>
+        <span class="d">ДАТА · МІСЦЕ</span>
+      </div>
+      <span class="label">Урочисто</span>
+    </div>
+  </div>
+  <div class="more"><p>Оформлення, створене з урахуванням ваших побажань</p></div>
+  <div class="swipe">Гортайте <svg viewBox="0 0 60 14"><path d="M0 7h58M51 1l7 6-7 6" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></div>
+</section>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     СЛАЙД 4 — ПЕРЕВАГИ
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="holder"><span class="tag">04</span>
+<section class="slide s4" data-name="04-perevahy">
+  <div class="s-top"><span class="brand" data-brand>Сайти-запрошення</span><span class="num">04 / 05</span></div>
+  <div class="copy">
+    <p class="kicker">Що буде на сайті</p>
+    <h2 class="h">Усе важливе —<br>за одним <em>посиланням</em></h2>
+    <p class="lead">Дата, місце, деталі свята та підтвердження присутності гостей&nbsp;— у&nbsp;зручному форматі</p>
+  </div>
+  <div class="phone"><div class="screen"><img data-slot="day" alt=""><div class="island"></div></div></div>
+  <div class="link">
+    <span class="ic"><svg viewBox="0 0 24 24"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg></span>
+    Одне посилання — для всіх гостей
+  </div>
+  <ul class="feats">
+    <li><span class="n">01</span><div><b>Дата і час</b><span>день, година початку свята</span></div></li>
+    <li><span class="n">02</span><div><b>Місце та мапа</b><span>адреса і маршрут в один дотик</span></div></li>
+    <li><span class="n">03</span><div><b>Програма і дрескод</b><span>розклад та палітра вбрання</span></div></li>
+    <li><span class="n">04</span><div><b>Анкета для гостей</b><span>підтвердження присутності онлайн</span></div></li>
+  </ul>
+  <p class="note">Інші розділи — за індивідуальним узгодженням</p>
+</section>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     СЛАЙД 5 — ЗАКЛИК ДО ДІЇ
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="holder"><span class="tag">05</span>
+<section class="slide s5 dark" data-name="05-dyrect">
+  <div class="frame"></div>
+  <div class="s-top"><span class="brand" data-brand>Сайти-запрошення</span><span class="num">05 / 05</span></div>
+  <div class="center">
+    <svg class="rings" viewBox="0 0 120 80"><circle cx="46" cy="40" r="30"/><circle cx="74" cy="40" r="30"/></svg>
+    <h2 class="h">Створімо ваше<br>запрошення <em>разом</em></h2>
+    <div class="rule"></div>
+    <p class="lead">Розкажіть про свою подію — і ми обговоримо ідею вашого персонального сайту</p>
+    <div class="cta">
+      <svg viewBox="0 0 24 24"><path d="M21.5 3 10.2 14.3M21.5 3l-6.8 18-3.9-6.9-7.3-3.4L21.5 3Z"/></svg>
+      Напишіть у Direct
+    </div>
+    <p class="handle" data-handle></p>
+  </div>
+  <p class="events">Весілля · Хрестини · Дні народження · Ювілеї</p>
+</section>
+</div>
+
+  </div><!-- /slides -->
+
+  <nav class="nav" aria-label="Слайди">
+    <button class="btn arrow" id="prev" aria-label="Попередній слайд">←</button>
+    <div class="dots" id="dots"></div>
+    <span class="counter" id="counter">1 / 5</span>
+    <button class="btn arrow" id="next" aria-label="Наступний слайд">→</button>
+  </nav>
+  <p class="hint">Стрілки ← → або свайп — перемикання. «Усі слайди» — огляд; клік по слайду відкриває його окремо. Кожен слайд окремо в розмірі 1:1: <span id="solo-links"></span></p>
+</main>
+
+<!-- Панель «Скриншоти» -->
+<dialog id="dlg-shots">
+  <div class="dlg-head"><h2>Скриншоти сайту</h2><button class="btn" data-close>Закрити</button></div>
+  <div class="dlg-body">
+    <p class="note">Тут можна тимчасово підставити інший скриншот (вертикальний, з телефона). Щоб замінити назавжди — покладіть файл у папку <b>img/</b> і вкажіть його назву в блоці <b>SCREENS</b> у кінці цього файлу.</p>
+    <div id="slots"></div>
+    <button class="btn" id="slots-reset">Повернути стандартні скриншоти</button>
+  </div>
+</dialog>
+
+<!-- Панель «Тексти» — підпис до публікації та сторіс (редагуйте тут) -->
+<dialog id="dlg-texts">
+  <div class="dlg-head"><h2>Тексти для публікації</h2><button class="btn" data-close>Закрити</button></div>
+  <div class="dlg-body">
+    <div class="copybox"><h3>Підпис до каруселі <button class="btn" data-copy="cap">Копіювати</button></h3>
+<pre id="cap">Особливі події заслуговують на особливі запрошення 🤍
+
+Уявіть запрошення, яке не загубиться серед десятків повідомлень, а збере всі важливі деталі вашого свята в одному місці — красиво, зручно і саме у вашому стилі.
+
+Я створюю персональні сайти-запрошення для весіль, хрестин, днів народження, ювілеїв та інших сімейних свят. Гості отримують одне посилання — і все потрібне завжди під рукою.
+
+Що можна додати на сайт:
+— імена та фотографії;
+— дату, час і місце проведення;
+— дрескод і програму свята;
+— карту та підтвердження присутності гостей.
+
+Дизайн і наповнення обговорюємо індивідуально — так, щоб запрошення передавало атмосферу саме вашої події.
+
+Гортайте карусель, щоб побачити приклад сайту →
+
+Плануєте свято? Напишіть мені в Direct — разом обговоримо ідею вашого запрошення 💌
+
+#сайтзапрошення #онлайнзапрошення #запрошеннянавесілля #весільнезапрошення #запрошенняонлайн #хрестини #деньнародження #ювілей #весілля #електроннезапрошення</pre></div>
+    <div class="copybox"><h3>Сторіс · варіант 1 <button class="btn" data-copy="st1">Копіювати</button></h3>
+<pre id="st1">Шукаєте особливе запрошення для свого свята? 🤍
+Розповіла в новій публікації, як виглядає сайт-запрошення.
+Тисніть, щоб подивитися ↓</pre></div>
+    <div class="copybox"><h3>Сторіс · варіант 2 <button class="btn" data-copy="st2">Копіювати</button></h3>
+<pre id="st2">Весілля, хрестини, день народження чи ювілей?
+Створю для вашого свята персональний сайт-запрошення 💌
+Пишіть у Direct — обговоримо ідею!</pre></div>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script src="vendor/html-to-image.js"></script>
+<script>
+/* =====================================================================
+   НАЛАШТУВАННЯ — найчастіше потрібне саме це
+   ===================================================================== */
+
+/* Назва вгорі кожного слайда (наприклад, назва вашої студії). */
+var BRAND = 'Сайти-запрошення';
+
+/* Ваш нік в Instagram на останньому слайді. Порожньо '' — рядок не показується.
+   Наприклад: '@my.invitations' */
+var INSTAGRAM = '';
+
+/* Скриншоти вашого сайту (папка img/). Щоб замінити — покладіть свій файл
+   у img/ і впишіть його назву. Найкраще підходять вертикальні скриншоти
+   з телефона (співвідношення приблизно 9:19.5, наприклад 1170 × 2532). */
+var SCREENS = {
+  hero:   { file: 'img/site-hero.jpg',   title: 'Обкладинка сайту',      used: 'слайди 1 і 2' },
+  invite: { file: 'img/site-invite.jpg', title: 'Блок «Запрошення»',      used: 'слайд 2' },
+  day:    { file: 'img/site-day.jpg',    title: 'Дата, місце та час',     used: 'слайди 2 і 4' }
+};
+
+/* ===================================================================== */
+(function () {
+  var holders = [].slice.call(document.querySelectorAll('.holder'));
+  var slides = holders.map(function (h) { return h.querySelector('.slide'); });
+  var stage = document.getElementById('stage');
+  var current = 0;
+  var custom = {};
+  try { custom = JSON.parse(localStorage.getItem('carousel-screens') || '{}'); } catch (e) {}
+
+  /* бренд, нік, скриншоти */
+  [].forEach.call(document.querySelectorAll('[data-brand]'), function (el) { el.textContent = BRAND; });
+  [].forEach.call(document.querySelectorAll('[data-handle]'), function (el) { el.textContent = INSTAGRAM; });
+  function applyScreens() {
+    [].forEach.call(document.querySelectorAll('img[data-slot]'), function (img) {
+      var key = img.getAttribute('data-slot');
+      img.src = custom[key] || (SCREENS[key] && SCREENS[key].file) || '';
+    });
+  }
+  applyScreens();
+
+  /* режим одного слайда: index.html?slide=3 */
+  var m = location.search.match(/[?&]slide=(\d)/);
+  if (m) {
+    document.body.classList.add('solo');
+    current = Math.min(Math.max(+m[1] - 1, 0), slides.length - 1);
+    holders.forEach(function (h, i) { h.classList.toggle('active', i === current); });
+    return;
+  }
+
+  /* масштабування слайдів під екран */
+  var mode = 'carousel';
+  function layout() {
+    if (mode === 'carousel') {
+      var bar = document.querySelector('.bar').offsetHeight;
+      var reserve = bar + 32 + 58 + 40 + 14 * 2; /* відступи, навігація, підказка */
+      var availH = Math.max(window.innerHeight - reserve, 240);
+      var availW = stage.clientWidth - 32;
+      var w = Math.floor(Math.min(availW, availH * 1080 / 1350));
+      holders.forEach(function (h) { h.style.width = w + 'px'; h.style.height = Math.round(w * 1350 / 1080) + 'px'; });
+    } else {
+      holders.forEach(function (h) { h.style.width = ''; h.style.height = ''; });
+    }
+    holders.forEach(function (h, i) { slides[i].style.transform = 'scale(' + (h.clientWidth / 1080) + ')'; });
+  }
+  window.addEventListener('resize', layout);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout);
+
+  /* навігація */
+  var dots = document.getElementById('dots');
+  slides.forEach(function (_, i) {
+    var b = document.createElement('button');
+    b.setAttribute('aria-label', 'Слайд ' + (i + 1));
+    b.onclick = function () { go(i); };
+    dots.appendChild(b);
+  });
+  function go(i) {
+    current = (i + slides.length) % slides.length;
+    holders.forEach(function (h, k) { h.classList.toggle('active', k === current); });
+    [].forEach.call(dots.children, function (d, k) { d.classList.toggle('on', k === current); });
+    document.getElementById('counter').textContent = (current + 1) + ' / ' + slides.length;
+    layout();
+  }
+  document.getElementById('prev').onclick = function () { go(current - 1); };
+  document.getElementById('next').onclick = function () { go(current + 1); };
+  document.addEventListener('keydown', function (e) {
+    if (document.querySelector('dialog[open]')) return;
+    if (e.key === 'ArrowLeft') go(current - 1);
+    if (e.key === 'ArrowRight') go(current + 1);
+  });
+  var x0 = null;
+  stage.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+  stage.addEventListener('touchend', function (e) {
+    if (x0 === null || mode !== 'carousel') return;
+    var dx = e.changedTouches[0].clientX - x0; x0 = null;
+    if (Math.abs(dx) > 40) go(current + (dx < 0 ? 1 : -1));
+  });
+
+  function setMode(next) {
+    mode = next;
+    document.body.classList.toggle('mode-carousel', mode === 'carousel');
+    document.body.classList.toggle('mode-grid', mode === 'grid');
+    document.getElementById('btn-carousel').setAttribute('aria-pressed', mode === 'carousel');
+    document.getElementById('btn-grid').setAttribute('aria-pressed', mode === 'grid');
+    layout();
+  }
+  document.getElementById('btn-carousel').onclick = function () { setMode('carousel'); };
+  document.getElementById('btn-grid').onclick = function () { setMode('grid'); };
+  holders.forEach(function (h, i) { h.addEventListener('click', function () { if (mode === 'grid') { setMode('carousel'); go(i); } }); });
+
+  var solo = document.getElementById('solo-links');
+  solo.innerHTML = slides.map(function (_, i) { return '<a style="color:inherit" href="?slide=' + (i + 1) + '" target="_blank">' + (i + 1) + '</a>'; }).join(' · ');
+
+  /* повідомлення */
+  var toastTimer;
+  function toast(text, ms) {
+    var t = document.getElementById('toast');
+    t.innerHTML = text; t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.classList.remove('show'); }, ms || 3500);
+  }
+
+  /* експорт PNG 1080 × 1350 */
+  function exportSlide(i) {
+    var node = slides[i];
+    var prev = node.style.transform;
+    return htmlToImage.toPng(node, {
+      width: 1080, height: 1350, pixelRatio: 1, cacheBust: false,
+      style: { transform: 'none' }
+    }).then(function (url) {
+      node.style.transform = prev;
+      var a = document.createElement('a');
+      a.download = 'slide-' + node.getAttribute('data-name') + '.png';
+      a.href = url; document.body.appendChild(a); a.click(); a.remove();
+    });
+  }
+  function exportFail(err) {
+    console.error(err);
+    if (location.protocol === 'file:') {
+      toast('Браузер блокує збереження PNG, коли файл відкрито напряму з диска. Відкрийте карусель через локальний сервер або GitHub Pages (див. README) — або візьміть готові PNG з папки <b>png/</b>.', 9000);
+    } else {
+      toast('Не вдалося зберегти PNG. Спробуйте Chrome або Edge, або візьміть готові файли з папки <b>png/</b>.', 7000);
+    }
+  }
+  function busy(on) { ['btn-png', 'btn-png-all'].forEach(function (id) { document.getElementById(id).disabled = on; }); }
+  document.getElementById('btn-png').onclick = function () {
+    busy(true); toast('Зберігаю слайд ' + (current + 1) + '…');
+    exportSlide(current).then(function () { toast('Готово: слайд ' + (current + 1) + ' збережено (1080 × 1350).'); }, exportFail).then(function () { busy(false); });
+  };
+  document.getElementById('btn-png-all').onclick = function () {
+    busy(true);
+    var chain = Promise.resolve();
+    slides.forEach(function (_, i) {
+      chain = chain.then(function () { toast('Зберігаю слайд ' + (i + 1) + ' з 5…', 60000); return exportSlide(i); })
+                   .then(function () { return new Promise(function (r) { setTimeout(r, 450); }); });
+    });
+    chain.then(function () { toast('Готово: 5 файлів PNG 1080 × 1350 у папці «Завантаження». Якщо браузер спитає дозвіл на кілька файлів — дозвольте.', 7000); }, exportFail)
+         .then(function () { busy(false); });
+  };
+
+  /* панель скриншотів */
+  var dlgShots = document.getElementById('dlg-shots');
+  var slotsBox = document.getElementById('slots');
+  function renderSlots() {
+    slotsBox.innerHTML = '';
+    Object.keys(SCREENS).forEach(function (key) {
+      var s = SCREENS[key];
+      var row = document.createElement('div');
+      row.className = 'slot';
+      row.innerHTML = '<img alt=""><div><b></b><small></small></div><label class="btn">Замінити<input type="file" accept="image/*"></label>';
+      row.querySelector('img').src = custom[key] || s.file;
+      row.querySelector('b').textContent = s.title;
+      row.querySelector('small').textContent = 'Використовується: ' + s.used + (custom[key] ? ' · ваше зображення' : '');
+      row.querySelector('input').onchange = function (e) {
+        var f = e.target.files[0]; if (!f) return;
+        var rd = new FileReader();
+        rd.onload = function () {
+          custom[key] = rd.result;
+          try { localStorage.setItem('carousel-screens', JSON.stringify(custom)); } catch (err) {}
+          applyScreens(); renderSlots();
+        };
+        rd.readAsDataURL(f);
+      };
+      slotsBox.appendChild(row);
+    });
+  }
+  document.getElementById('btn-shots').onclick = function () { renderSlots(); dlgShots.showModal(); };
+  document.getElementById('slots-reset').onclick = function () {
+    custom = {}; try { localStorage.removeItem('carousel-screens'); } catch (e) {}
+    applyScreens(); renderSlots();
+  };
+
+  /* панель текстів */
+  var dlgTexts = document.getElementById('dlg-texts');
+  document.getElementById('btn-texts').onclick = function () { dlgTexts.showModal(); };
+  [].forEach.call(document.querySelectorAll('[data-copy]'), function (b) {
+    b.onclick = function () {
+      var text = document.getElementById(b.getAttribute('data-copy')).textContent;
+      (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(
+        function () { b.textContent = 'Скопійовано'; setTimeout(function () { b.textContent = 'Копіювати'; }, 1600); },
+        function () { toast('Виділіть текст і скопіюйте вручну.'); });
+    };
+  });
+  [].forEach.call(document.querySelectorAll('[data-close]'), function (b) { b.onclick = function () { b.closest('dialog').close(); }; });
+
+  go(0);
+})();
+</script>
+</body>
+</html>
