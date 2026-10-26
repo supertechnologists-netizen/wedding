@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Сайт-запрошення на весілля та свята</title>
+<meta name="description" content="Красиве онлайн-запрошення з анкетою гостей: один лінк замість сотні повідомлень.">
+<meta property="og:title" content="Сайт-запрошення на весілля та свята">
+<meta property="og:description" content="Один лінк замість сотні повідомлень. Анкета гостей, список відповідей, готово за кілька днів.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#17050A; --wine:#4B0F1C; --wine-deep:#2A0810; --wine-soft:#6E1A2C;
+  --milk:#F4EBE4; --milk-2:#EBDDD3; --gold:#D5BFA3;
+  --f-display:"Cormorant Garamond",Georgia,serif;
+  --f-body:"Jost","Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--ink);color:var(--milk);font-family:var(--f-body);font-weight:300;overflow:hidden}
+.deck{position:fixed;inset:0}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;
+  padding:clamp(28px,7vw,110px);opacity:0;visibility:hidden;transform:translateY(14px);
+  transition:opacity .5s ease,transform .5s ease,visibility .5s;
+  background:radial-gradient(ellipse at 20% 0%,var(--wine-soft) 0,var(--wine) 45%,var(--wine-deep) 100%);overflow:auto}
+.slide.on{opacity:1;visibility:visible;transform:none}
+.slide.light{background:var(--milk);color:var(--wine)}
+.slide.light .kicker,.slide.light .card p{color:rgba(59,10,21,.7)}
+.slide.light .card{border-color:rgba(75,15,28,.25)}
+.slide.light .num{color:var(--wine-soft)}
+.kicker{font-size:clamp(11px,1.3vw,14px);letter-spacing:.32em;text-transform:uppercase;color:var(--gold);margin-bottom:1.4em}
+h1,h2{font-family:var(--f-display);font-weight:500;line-height:1.05}
+h1{font-size:clamp(44px,9vw,120px)}
+h2{font-size:clamp(34px,5.6vw,76px);margin-bottom:.5em}
+h1 em,h2 em{font-style:italic;color:var(--gold)}
+.slide.light h2 em{color:var(--wine-soft)}
+.lead{font-size:clamp(16px,2vw,24px);max-width:34em;line-height:1.55;opacity:.85}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:clamp(14px,2vw,28px);margin-top:1.2em}
+.card{border:1px solid rgba(244,235,228,.24);padding:clamp(18px,2.4vw,32px)}
+.card h3{font-family:var(--f-display);font-weight:500;font-size:clamp(22px,2.6vw,32px);margin-bottom:.4em}
+.card p{font-size:clamp(14px,1.5vw,17px);line-height:1.55;color:rgba(244,235,228,.72)}
+.num{font-family:var(--f-display);font-size:clamp(40px,5vw,64px);color:var(--gold);line-height:1;margin-bottom:.3em}
+.cta{display:inline-block;margin-top:1.6em;padding:1em 2.2em;border:1px solid var(--gold);color:var(--milk);
+  text-decoration:none;letter-spacing:.2em;text-transform:uppercase;font-size:13px;transition:.25s}
+.cta:hover{background:var(--gold);color:var(--wine-deep)}
+.contacts{margin-top:1.4em;font-size:clamp(16px,2vw,22px);line-height:1.9}
+.contacts a{color:var(--gold)}
+.frame{display:block;width:100%;max-width:340px;aspect-ratio:9/16;border:1px solid rgba(244,235,228,.3);background:#fff;margin-top:1em}
+.split{display:flex;gap:clamp(20px,5vw,70px);align-items:center;flex-wrap:wrap}
+.split>div{flex:1 1 300px}
+ul.tick{list-style:none;font-size:clamp(16px,2vw,22px);line-height:1.5}
+ul.tick li{padding:.45em 0 .45em 1.6em;position:relative;border-bottom:1px solid rgba(244,235,228,.15)}
+ul.tick li:before{content:"✦";position:absolute;left:0;color:var(--gold);font-size:.8em;top:.7em}
+.ui{position:fixed;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:space-between;
+  padding:14px clamp(16px,4vw,40px);z-index:5;pointer-events:none;font-size:12px;letter-spacing:.2em;color:rgba(244,235,228,.6)}
+.ui button{pointer-events:auto;background:none;border:1px solid rgba(244,235,228,.35);color:var(--milk);
+  width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:16px}
+.ui button:hover{background:rgba(244,235,228,.15)}
+.bar{position:fixed;top:0;left:0;height:2px;background:var(--gold);transition:width .4s;z-index:6}
+.ui.dark{color:rgba(59,10,21,.6)}
+.ui.dark button{border-color:rgba(75,15,28,.4);color:var(--wine)}
+@media print{
+  html,body{overflow:visible;height:auto}.deck{position:static}.ui,.bar{display:none}
+  .slide{position:relative;opacity:1;visibility:visible;transform:none;min-height:100vh;page-break-after:always;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div class="bar" id="bar"></div>
+<main class="deck" id="deck">
+
+<section class="slide on">
+  <p class="kicker">Онлайн-запрошення</p>
+  <h1>Ваше свято —<br><em>одним посиланням</em></h1>
+  <p class="lead" style="margin-top:1.4em">Сайт-запрошення на весілля, хрестини та будь-яке свято. З анкетою гостей і списком відповідей.</p>
+</section>
+
+<section class="slide light">
+  <p class="kicker">Знайоме?</p>
+  <h2>Запрошення — це <em>сотня повідомлень</em></h2>
+  <div class="grid">
+    <div class="card"><div class="num">01</div><h3>Хаос у месенджерах</h3><p>Відповіді розкидані по чатах, дзвінках і голосових. Хто прийде — ніхто не знає точно.</p></div>
+    <div class="card"><div class="num">02</div><h3>Паперові запрошення</h3><p>Друк, доставка, зміни в програмі — і все треба переробляти та розвозити знову.</p></div>
+    <div class="card"><div class="num">03</div><h3>Однакові картинки</h3><p>Шаблон із інтернету, який гості вже бачили на сотні інших свят.</p></div>
+  </div>
+</section>
+
+<section class="slide">
+  <p class="kicker">Рішення</p>
+  <h2>Сайт, який <em>працює за вас</em></h2>
+  <ul class="tick">
+    <li>Власний дизайн під вашу пару та кольори свята</li>
+    <li>Дата, місце, час, дрес-код — і кнопка «Відкрити на мапі»</li>
+    <li>Анкета гостей: прийде чи ні, скільки людей, напої, коментар</li>
+    <li>Приватна сторінка зі списком відповідей і вивантаженням в Excel</li>
+    <li>Гарне прев’ю посилання в Telegram та Viber</li>
+  </ul>
+</section>
+
+<section class="slide light">
+  <p class="kicker">Як це виглядає</p>
+  <h2>Наші <em>роботи</em></h2>
+  <div class="grid">
+    <div class="card"><h3>Весілля Юлії та Євгенія</h3><p>Бордово-бежева палітра, фото пари, RSVP-анкета та приватний дашборд для молодят.</p>
+      <p style="margin-top:1em"><a href="../" style="color:var(--wine)">Відкрити сайт →</a></p></div>
+    <div class="card"><h3>Хрещення Даміра</h3><p>Ніжний дизайн для сімейного свята, окрема анкета гостей та превʼю для месенджерів.</p>
+      <p style="margin-top:1em"><a href="../damir/" style="color:var(--wine)">Відкрити сайт →</a></p></div>
+  </div>
+</section>
+
+<section class="slide">
+  <p class="kicker">Для кого</p>
+  <h2>Підійде для <em>будь-якої події</em></h2>
+  <div class="grid">
+    <div class="card"><h3>Весілля</h3><p>Класика, яка збирає всі відповіді гостей в одному місці.</p></div>
+    <div class="card"><h3>Хрестини</h3><p>Тепле запрошення для родини та близьких.</p></div>
+    <div class="card"><h3>Дні народження та ювілеї</h3><p>Від камерного вечора до великого банкету.</p></div>
+    <div class="card"><h3>Корпоративи</h3><p>Реєстрація учасників і зрозумілий список.</p></div>
+  </div>
+</section>
+
+<section class="slide light">
+  <p class="kicker">Як ми працюємо</p>
+  <h2>Від ідеї до посилання — <em>кілька днів</em></h2>
+  <div class="grid">
+    <div class="card"><div class="num">1</div><h3>Розповідаєте</h3><p>Дата, місце, настрій, кольори, кілька фото.</p></div>
+    <div class="card"><div class="num">2</div><h3>Ми робимо</h3><p>Дизайн і сайт. Ви бачите результат і просите правки.</p></div>
+    <div class="card"><div class="num">3</div><h3>Запускаємо</h3><p>Публікуємо та підключаємо анкету гостей.</p></div>
+    <div class="card"><div class="num">4</div><h3>Ви збираєте відповіді</h3><p>Вони самі потрапляють у таблицю й на приватну сторінку.</p></div>
+  </div>
+</section>
+
+<section class="slide">
+  <p class="kicker">Переваги</p>
+  <h2>Чому <em>це зручно</em></h2>
+  <div class="grid">
+    <div class="card"><h3>Швидко</h3><p>Один лінк надсилається всім гостям одразу.</p></div>
+    <div class="card"><h3>Змінюйте будь-коли</h3><p>Змінився час чи адреса — оновлюємо на сайті, гості бачать актуальне.</p></div>
+    <div class="card"><h3>Усе під контролем</h3><p>Список гостей, кількість місць і побажання щодо напоїв — у вас перед очима.</p></div>
+    <div class="card"><h3>Без застосунків</h3><p>Відкривається у браузері на будь-якому телефоні.</p></div>
+  </div>
+</section>
+
+<section class="slide">
+  <p class="kicker">Контакти</p>
+  <h2>Зробимо <em>і вам</em></h2>
+  <p class="lead">Напишіть нам дату та назву свята — запропонуємо ідею і покажемо приклад.</p>
+  <div class="contacts">
+    <!-- ЗАМІНІТЬ на свої контакти -->
+    Telegram: <a href="https://t.me/your_username">@your_username</a><br>
+    Телефон: <a href="tel:+380000000000">+380 00 000 00 00</a><br>
+    Email: <a href="mailto:supertechnologists@gmail.com">supertechnologists@gmail.com</a>
+  </div>
+  <div><a class="cta" href="https://t.me/your_username">Написати нам</a></div>
+</section>
+
+</main>
+
+<div class="ui" id="ui">
+  <button id="prev" aria-label="Назад">←</button>
+  <span id="count"></span>
+  <button id="next" aria-label="Вперед">→</button>
+</div>
+
+<script>
+(function(){
+  var slides=[].slice.call(document.querySelectorAll('.slide')),
+      i=0,bar=document.getElementById('bar'),
+      count=document.getElementById('count'),ui=document.getElementById('ui');
+  function go(n){
+    i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach(function(s,k){s.classList.toggle('on',k===i)});
+    bar.style.width=((i+1)/slides.length*100)+'%';
+    count.textContent=(i+1)+' / '+slides.length;
+    ui.classList.toggle('dark',slides[i].classList.contains('light'));
+    try{history.replaceState(null,'','#'+(i+1))}catch(e){}
+  }
+  var h=parseInt(location.hash.slice(1),10);
+  go(h?h-1:0);
+  window.addEventListener('hashchange',function(){var n=parseInt(location.hash.slice(1),10);if(n&&n-1!==i)go(n-1)});
+  document.getElementById('prev').onclick=function(){go(i-1)};
+  document.getElementById('next').onclick=function(){go(i+1)};
+  document.addEventListener('keydown',function(e){
+    if(['ArrowRight','ArrowDown','PageDown',' '].indexOf(e.key)>-1){e.preventDefault();go(i+1)}
+    if(['ArrowLeft','ArrowUp','PageUp'].indexOf(e.key)>-1){e.preventDefault();go(i-1)}
+    if(e.key==='Home')go(0);
+    if(e.key==='End')go(slides.length-1);
+  });
+  var x0=null;
+  document.addEventListener('touchstart',function(e){x0=e.touches[0].clientX},{passive:true});
+  document.addEventListener('touchend',function(e){
+    if(x0===null)return;var d=e.changedTouches[0].clientX-x0;
+    if(Math.abs(d)>50)go(i+(d<0?1:-1));x0=null;
+  });
+})();
+</script>
+</body>
+</html>
