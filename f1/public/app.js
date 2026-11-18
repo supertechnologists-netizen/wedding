@@ -218,7 +218,7 @@
       const edge = rw / 2 + 6 + k;                       // distance from road centre to outer kerb edge
       const gap = A + edge + 34;
       if (mob) stopsEl.style.setProperty('--ml', (cx + A + edge + 40 - stopsEl.offsetLeft) + 'px'); else stopsEl.style.setProperty('--gap', gap + 'px');
-      y0 = stopsEl.offsetTop - 50; y1 = endEl.offsetTop + 54; yMax = y1 - (mob ? 44 : 62);
+      y0 = stopsEl.offsetTop - 6; y1 = endEl.offsetTop + 54; yMax = y1 - (mob ? 44 : 62);
       const xAt = y => cx + A * Math.sin((y - y0) / P * 2 * Math.PI);
       pts = [];
       for (let y = y0; y <= y1 + 40; y += 6) pts.push({ x: xAt(y), y });
@@ -255,7 +255,7 @@
       const ang = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI;
       car.style.transform = `translate3d(${x.toFixed(1)}px,${cy.toFixed(1)}px,0) rotate(${ang.toFixed(2)}deg)`;
       car.style.setProperty('--tr', Math.min(.9, Math.abs(v) / 6).toFixed(2));
-      car.classList.toggle('show', inView || cy > y0 + 4);
+      car.classList.toggle('show', inView && targetY > y0 + 6);
       marks.forEach(m => { const on = cy >= m.y - 4; if (on !== m.g.classList.contains('on')) { m.g.classList.toggle('on', on); m.el.classList.toggle('active', on); if (on) Audio_.stop(); } });
       const done = cy >= yMax - 2;
       if (done && !arrived) { arrived = true; $('.vcard').classList.add('arrived'); Audio_.finish(); Confetti.burst(.5, .55); }
