@@ -3,27 +3,27 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Anna &amp; Andrii · Запрошення на весілля</title>
-<meta name="description" content="Аня та Андрій запрошують вас на своє весілля. Lights out and away we go!">
-<meta name="theme-color" content="#faf7f2">
-<meta property="og:title" content="Anna &amp; Andrii · Запрошення на весілля">
-<meta property="og:description" content="Найкраща гонка — та, яку ми біжимо разом. Запрошуємо вас на наше весілля.">
+<title>Anna &amp; Andrii · Wedding Grand Prix</title>
+<meta name="description" content="Wedding Grand Prix: Аня та Андрій запрошують вас на головну гонку свого життя. Lights out and away we go!">
+<meta name="theme-color" content="#ececec">
+<meta property="og:title" content="Anna &amp; Andrii · Wedding Grand Prix">
+<meta property="og:description" content="Lights out and away we go! Запрошення на весілля.">
 <meta property="og:type" content="website">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Jost:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap">
 <link rel="stylesheet" href="/style.css">
 </head>
 <body class="intro-on">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
-  <pattern id="chk6" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="#fff"/><rect width="6" height="6" fill="#1c1b1a"/><rect x="6" y="6" width="6" height="6" fill="#1c1b1a"/></pattern>
+  <pattern id="chk6" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="#fff"/><rect width="6" height="6" fill="#111"/><rect x="6" y="6" width="6" height="6" fill="#111"/></pattern>
   <symbol id="flag-green" viewBox="0 0 36 24"><path d="M0 2C9-2 15 6 24 2S33 6 36 2V22C27 26 21 18 12 22S3 18 0 22Z" fill="#00a651"/></symbol>
   <symbol id="flag-yellow" viewBox="0 0 36 24"><path d="M0 2C9-2 15 6 24 2S33 6 36 2V22C27 26 21 18 12 22S3 18 0 22Z" fill="#ffd400"/></symbol>
   <symbol id="flag-blue" viewBox="0 0 36 24"><path d="M0 2C9-2 15 6 24 2S33 6 36 2V22C27 26 21 18 12 22S3 18 0 22Z" fill="#0a6fd8"/></symbol>
   <symbol id="flag-red" viewBox="0 0 36 24"><path d="M0 2C9-2 15 6 24 2S33 6 36 2V22C27 26 21 18 12 22S3 18 0 22Z" fill="#d6001c"/></symbol>
-  <symbol id="flag-white" viewBox="0 0 36 24"><path d="M0 2C9-2 15 6 24 2S33 6 36 2V22C27 26 21 18 12 22S3 18 0 22Z" fill="#fff" stroke="#1c1b1a" stroke-width="1.3"/></symbol>
-  <symbol id="flag-chk" viewBox="0 0 36 24"><path d="M0 2C9-2 15 6 24 2S33 6 36 2V22C27 26 21 18 12 22S3 18 0 22Z" fill="url(#chk6)" stroke="#1c1b1a" stroke-width="1.3"/></symbol>
+  <symbol id="flag-white" viewBox="0 0 36 24"><path d="M0 2C9-2 15 6 24 2S33 6 36 2V22C27 26 21 18 12 22S3 18 0 22Z" fill="#fff" stroke="#111" stroke-width="1.3"/></symbol>
+  <symbol id="flag-chk" viewBox="0 0 36 24"><path d="M0 2C9-2 15 6 24 2S33 6 36 2V22C27 26 21 18 12 22S3 18 0 22Z" fill="url(#chk6)" stroke="#111" stroke-width="1.3"/></symbol>
   <linearGradient id="carGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff3a2c"/><stop offset=".5" stop-color="#d6001c"/><stop offset="1" stop-color="#8e0013"/></linearGradient>
   <symbol id="f1car" viewBox="-50 -22 100 44" overflow="visible">
     <rect x="-49" y="-19" width="9" height="38" rx="1.5" fill="#15151a"/><rect x="-49" y="-19" width="9" height="4" fill="#d6001c"/><rect x="-49" y="15" width="9" height="4" fill="#d6001c"/>
@@ -41,21 +41,19 @@
   </symbol>
 </defs></svg>
 
-<!-- LIGHTS OUT -->
-<div id="intro" role="dialog" aria-label="Стартовий світлофор">
-  <p class="intro-names">Anna &amp; Andrii</p>
-  <div class="gantry"><div class="lights" aria-hidden="true">
-    <div class="col"><i></i><i></i></div><div class="col"><i></i><i></i></div><div class="col"><i></i><i></i></div><div class="col"><i></i><i></i></div><div class="col"><i></i><i></i></div>
-  </div></div>
-  <p class="intro-text" id="introText">Formation lap…</p>
-  <button class="skip" id="skipIntro" type="button">Пропустити ▸▸</button>
+<!-- ============ LOADER ============ -->
+<div id="intro" role="dialog" aria-label="Завантаження">
+  <div class="lights" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+  <p class="intro-text" id="introText">Завантажуємо щось важливе…</p>
+  <div class="ld-road" aria-hidden="true"><div class="ld-line"></div><svg class="ld-car" viewBox="-50 -22 100 44"><use href="#f1car" x="-50" y="-22" width="100" height="44"/></svg></div>
+  <button class="skip" id="skipIntro" type="button">Пропустити</button>
 </div>
 
 <header class="nav" id="nav">
-  <a class="brand" href="#top" aria-label="На початок"><span>A</span><i></i><span>A</span></a>
+  <a class="brand" href="#top" aria-label="На початок">A<b>×</b>A</a>
   <button class="burger" id="burger" aria-label="Меню" aria-expanded="false"><span></span><span></span></button>
   <nav id="menu">
-    <a href="#about">Про нас</a><a href="#route">Дорога</a><a href="#gallery">Галерея</a><a href="#dress">Дрес-код</a><a href="#rsvp" class="cta">RSVP</a>
+    <a href="#about">Про нас</a><a href="#route">Програма</a><a href="#venue">Місце</a><a href="#dress">Дрес-код</a><a href="#rsvp" class="cta">RSVP</a>
   </nav>
 </header>
 
@@ -63,27 +61,29 @@
   <button id="btnMusic" type="button" title="Музика" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M9 18V5l11-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm11-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg><b>Музика</b></button>
   <button id="btnSfx" type="button" title="Звукові ефекти" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4Zm12 0a4 4 0 0 1 0 6m2.5-9a8 8 0 0 1 0 12"/></svg><b>Ефекти</b></button>
 </div>
-
 <canvas id="confetti" aria-hidden="true"></canvas>
+
 <main id="top">
-<!-- ============ PREVIEW ============ -->
+<!-- ============ HERO ============ -->
 <section class="hero" id="hero">
-  <div class="hero-grid wrap">
-    <div class="hero-text">
-      <p class="greet" id="greet"></p>
-      <p class="tagline"><svg viewBox="0 0 36 24"><use href="#flag-chk"/></svg>Wedding Grand Prix</p>
-      <h1 class="names"><span id="nBride">ANNA</span><em>&amp;</em><span id="nGroom">ANDRII</span></h1>
-      <p class="invite">з радістю запрошують вас розділити з ними найурочистіший день у їхньому житті</p>
-      <div class="hero-date"><span class="ln"></span><b id="heroDate"></b><span class="ln"></span></div>
-      <div class="hero-meta"><span id="heroVenue"></span></div>
-      <p class="lights-line">Lights out and away we go!</p>
-      <a href="#about" class="btn" data-sfx="rev">Дізнатися більше <svg viewBox="0 0 24 24"><path d="M12 5v14m-6-6 6 6 6-6"/></svg></a>
-    </div>
-    <div class="hero-photo">
-      <div class="arch" id="heroArch"><span class="mono">A&amp;A</span></div>
-      <div class="tag t1"><svg viewBox="0 0 36 24"><use href="#flag-green"/></svg><b>Round 01</b></div>
-      <div class="tag t2"><svg viewBox="0 0 36 24"><use href="#flag-chk"/></svg><b id="tagDate"></b></div>
-      <div class="ring" aria-hidden="true"></div>
+  <div class="wrap">
+    <button class="vinyl" id="vinyl" type="button" aria-label="Увімкнути музику для настрою" aria-pressed="false">
+      <svg viewBox="0 0 200 200" aria-hidden="true">
+        <defs><path id="vp" d="M100 100m-74 0a74 74 0 1 1 148 0a74 74 0 1 1-148 0"/></defs>
+        <g class="vtext"><text><textPath href="#vp" startOffset="0">ВКЛЮЧИТИ МУЗИКУ ДЛЯ НАСТРОЮ ·&#160;</textPath></text></g>
+        <circle cx="100" cy="100" r="46" fill="#111"/><circle cx="100" cy="100" r="38" fill="none" stroke="#333" stroke-width="1.4"/><circle cx="100" cy="100" r="30" fill="none" stroke="#2a2a2a" stroke-width="1.2"/>
+        <circle cx="100" cy="100" r="17" fill="#111" stroke="#fff" stroke-width="2"/>
+        <path class="v-play" d="M94 91l16 9-16 9Z" fill="#fff"/><path class="v-pause" d="M93 92h5v16h-5zM102 92h5v16h-5z" fill="#fff"/>
+      </svg>
+    </button>
+    <p class="greet" id="greet"></p>
+    <p class="hero-names"><span id="nBride">ANNA</span> <i>×</i> <span id="nGroom">ANDRII</span></p>
+    <h1 class="hero-title"><span class="t1"><small>Wedding</small>Grand</span><span class="hero-tag">Lights out<br>and away<br>we go!</span><span class="t2">Prix</span></h1>
+    <div class="hero-photo" id="heroPhoto">
+      <svg class="mount" viewBox="0 0 400 220" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+        <path d="M0 220V150L60 90l40 40 70-90 60 70 40-30 60 60 70-70v200Z" fill="#d6d6d6"/><path d="M0 220V180l50-40 40 30 80-70 70 80 50-40 110 60v20Z" fill="#c4c4c4"/><path d="M0 220v-20l80-40 70 30 90-50 160 60v20Z" fill="#b2b2b2"/>
+      </svg>
+      <div class="hero-cap"><span id="heroDate"></span><span id="heroVenue"></span></div>
     </div>
   </div>
 </section>
@@ -91,25 +91,19 @@
 <!-- ============ ABOUT ============ -->
 <section class="about" id="about">
   <div class="wrap">
-    <p class="eyebrow rv">Наша історія</p>
-    <h2 class="rv">Двоє <em>пілотів</em>, одна команда</h2>
+    <h2 class="rv">Про<br>нас</h2>
     <p class="story rv" id="story"></p>
     <div class="people">
-      <article class="person rv" id="dBride">
-        <div class="photo arch" data-ph="A"></div>
-        <div class="info"><span class="role"><svg viewBox="0 0 36 24"><use href="#flag-red"/></svg>Navigator</span><h3>Аня</h3><p class="bio"></p></div>
-      </article>
-      <article class="person rv" id="dGroom">
-        <div class="photo arch" data-ph="A"></div>
-        <div class="info"><span class="role"><svg viewBox="0 0 36 24"><use href="#flag-blue"/></svg>Pilot</span><h3>Андрій</h3><p class="bio"></p></div>
-      </article>
+      <article class="person rv" id="dBride"><div class="photo" data-ph="A"></div><span class="role">Navigator</span><h3>Аня</h3><p class="bio"></p></article>
+      <article class="person rv" id="dGroom"><div class="photo" data-ph="A"></div><span class="role">Pilot</span><h3>Андрій</h3><p class="bio"></p></article>
     </div>
   </div>
 </section>
 
+<!-- ============ COUNTDOWN ============ -->
 <section class="count" id="count">
   <div class="wrap">
-    <p class="eyebrow rv">До старту залишилось</p>
+    <p class="lbl rv">До старту залишилось</p>
     <div class="cd rv" id="cd">
       <div><b id="cdD">--</b><span>днів</span></div><div><b id="cdH">--</b><span>годин</span></div><div><b id="cdM">--</b><span>хвилин</span></div><div><b id="cdS">--</b><span>секунд</span></div>
     </div>
@@ -117,78 +111,71 @@
   </div>
 </section>
 
-<!-- ============ ROAD / PROGRAM / VENUE ============ -->
-<section class="journey" id="route">
-  <svg id="road" aria-hidden="true">
-    <defs><pattern id="noise" patternUnits="userSpaceOnUse" width="160" height="160"><image id="noiseImg" width="160" height="160"/></pattern></defs>
-    <path id="rShadow" class="r-shadow"/><path id="rKerbR" class="r-kerb r"/><path id="rKerbW" class="r-kerb w"/><path id="rConc" class="r-conc"/><path id="rWhite" class="r-white"/>
-    <path id="rAsph" class="r-asph"/><path id="rNoise" class="r-noise"/><path id="rRubber" class="r-rubber"/>
-    <g id="rFinish"></g><g id="rMarks"></g>
-  </svg>
-  <div id="car" class="carbox" aria-hidden="true"><div class="trail"></div><svg viewBox="-50 -22 100 44"><use href="#f1car" x="-50" y="-22" width="100" height="44"/></svg></div>
-  <div class="wrap jhead">
-    <p class="eyebrow rv">Програма дня</p>
-    <h2 class="rv">Дорога до <em>свята</em></h2>
-    <p class="lead rv">Їдьте за машинкою — вона приведе вас до місця, де все почнеться.</p>
+<!-- ============ TIMELINE ============ -->
+<section class="route" id="route">
+  <div class="wrap">
+    <h2 class="rv">Програма<br>дня</h2>
+    <p class="lead rv" id="routeText"></p>
   </div>
-  <div class="wrap stops" id="stops"></div>
-  <div class="wrap venue-end" id="venueEnd">
-    <div class="vcard rv">
-      <div class="vinfo">
-        <span class="chip"><svg viewBox="0 0 36 24"><use href="#flag-chk"/></svg>Finish · Місце святкування</span>
-        <h3 id="vName"></h3>
-        <p class="vaddr" id="vAddr"></p>
-        <dl class="vdl"><div><dt>Дата</dt><dd id="vDate"></dd></div><div><dt>Початок</dt><dd id="vTime"></dd></div></dl>
-        <a class="btn" id="vMap" target="_blank" rel="noopener">Прокласти маршрут <svg viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a>
-        <p class="deadline" id="vDeadline"></p>
-      </div>
+  <div class="wrap tl" id="tl">
+    <div class="tl-line" aria-hidden="true"></div>
+    <div class="tl-end" aria-hidden="true"><svg viewBox="0 0 36 24"><use href="#flag-chk"/></svg></div>
+    <div class="tl-car" id="car" aria-hidden="true">
+      <svg class="body" viewBox="-50 -22 100 44"><use href="#f1car" x="-50" y="-22" width="100" height="44"/></svg>
+      <span class="face f1" id="face1"></span><span class="face f2" id="face2"></span>
+    </div>
+    <div class="tl-items" id="tlItems"></div>
+  </div>
+</section>
+
+<!-- ============ VENUE ============ -->
+<section class="venue" id="venue">
+  <div class="wrap">
+    <h2 class="rv">Місце</h2>
+    <div class="vbox rv">
+      <p class="vname" id="vName"></p><p class="vaddr" id="vAddr"></p>
+      <dl class="vdl"><div><dt>Дата</dt><dd id="vDate"></dd></div><div><dt>Початок</dt><dd id="vTime"></dd></div></dl>
       <div class="vmap"><iframe id="mapFrame" title="Карта" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
+      <a class="pill" id="vMap" target="_blank" rel="noopener">Прокласти маршрут</a>
+      <p class="deadline" id="vDeadline"></p>
     </div>
   </div>
 </section>
 
 <!-- ============ GALLERY ============ -->
 <section class="gallery" id="gallery">
-  <div class="wrap">
-    <p class="eyebrow rv">Паддок-фото</p>
-    <h2 class="rv">Наші <em>кола</em></h2>
-    <div class="gal" id="gal"></div>
-  </div>
+  <div class="wrap"><h2 class="rv">Наші<br>кола</h2></div>
+  <div class="gal" id="gal"></div>
 </section>
 
 <!-- ============ DRESS CODE ============ -->
 <section class="dress" id="dress">
   <div class="wrap">
-    <p class="eyebrow rv">Дрес-код</p>
-    <h2 class="rv">Кольори <em>свята</em></h2>
+    <h2 class="rv">Дрес-<br>код</h2>
     <p class="lead rv" id="dressText"></p>
     <div class="swatches rv" id="swatches" role="list"></div>
     <p class="sw-picked rv" id="swPicked">Торкніться кольору, щоб побачити його назву</p>
     <div class="looks">
-      <figure class="look rv">
-        <svg viewBox="0 0 200 300" role="img" aria-label="Приклад образу для жінок">
-          <path class="fa" d="M100 22c8 0 12 6 12 14l-2 20c-1 8 6 18 12 30l30 190c-30 14-82 14-112 0L70 86c6-12 13-22 12-30l-2-20c0-8 4-14 12-14Z"/>
-          <path class="fb" d="M84 60c8 10 24 10 32 0l-3 26c-8 6-18 6-26 0Z"/><path d="M100 118v176" stroke="#d6001c" stroke-width="3" opacity=".6"/>
-        </svg>
-        <figcaption><b>Для неї</b><span id="dressW"></span></figcaption>
-      </figure>
-      <figure class="look rv">
-        <svg viewBox="0 0 200 300" role="img" aria-label="Приклад образу для чоловіків">
-          <path class="fa" d="M70 40h60l30 28 8 140-26 6-4 72H62l-4-72-26-6 8-140Z"/><path d="M100 48v230" stroke="#3b3a39" stroke-width="2"/>
-          <path d="M84 40 100 100 116 40" fill="#faf7f2"/><path d="M100 56l-9 18 9 70 9-70Z" fill="#d6001c"/>
-          <circle cx="100" cy="150" r="2.5" fill="#faf7f2"/><circle cx="100" cy="180" r="2.5" fill="#faf7f2"/>
-        </svg>
-        <figcaption><b>Для нього</b><span id="dressM"></span></figcaption>
-      </figure>
+      <div class="look rv"><b>Для неї</b><span id="dressW"></span></div>
+      <div class="look rv"><b>Для нього</b><span id="dressM"></span></div>
     </div>
+  </div>
+</section>
+
+<!-- ============ GIFT ============ -->
+<section class="gift" id="gift">
+  <div class="wrap">
+    <h2 class="rv" id="giftTitle">Замість<br>квітів</h2>
+    <p class="lead rv" id="giftText"></p>
+    <div class="gifts rv" id="gifts"></div>
+    <a class="pill rv" id="giftBtn" target="_blank" rel="noopener">Обрати подарунок</a>
   </div>
 </section>
 
 <!-- ============ RSVP ============ -->
 <section class="rsvp" id="rsvp">
   <div class="wrap narrow">
-    <p class="eyebrow rv">RSVP</p>
-    <h2 class="rv">Чекаємо <em>на вас</em></h2>
+    <h2 class="rv">Чекаємо<br>на вас</h2>
     <p class="lead rv" id="rsvpLead">Дайте нам знати, чи будете ви поруч. Це займе хвилину.</p>
     <form id="rsvpForm" class="form rv" novalidate>
       <input type="hidden" name="code">
@@ -209,21 +196,21 @@
         <fieldset class="fld"><legend>Які напої ви обираєте? <em>(можна декілька)</em></legend><div class="chips" id="drinkChips"></div></fieldset>
       </div>
       <p class="err" id="rsvpErr" role="alert" hidden></p>
-      <button class="btn submit" type="submit" data-sfx="rev"><span>Надіслати відповідь</span><svg viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button>
+      <button class="pill solid submit" type="submit" data-sfx="rev">Надіслати відповідь</button>
     </form>
     <div class="done" id="rsvpDone" hidden>
       <div class="done-flag"></div>
       <h3 id="doneTitle">Дякуємо!</h3><p id="doneText"></p>
-      <button class="btn ghost" id="editAgain" type="button">Змінити відповідь</button>
+      <button class="pill" id="editAgain" type="button">Змінити відповідь</button>
     </div>
     <div class="wishes">
-      <h3 class="rv">Побажання та додаткова інформація</h3>
+      <h3 class="rv">Побажання</h3>
       <p class="lead rv">Залиште тепле слово молодятам, пісню для танцполу або будь-що, що нам варто знати.</p>
       <form id="wishForm" class="form rv" novalidate>
         <label class="fld"><span>Ваше ім’я</span><input name="name" required maxlength="100" autocomplete="name"></label>
         <label class="fld"><span>Повідомлення</span><textarea name="message" rows="4" required maxlength="2000" placeholder="Побажання, музика, запитання…"></textarea></label>
         <p class="err" id="wishErr" role="alert" hidden></p>
-        <button class="btn" type="submit"><span>Надіслати</span><svg viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button>
+        <button class="pill" type="submit">Надіслати</button>
         <p class="ok" id="wishOk" hidden>Дякуємо! Ваше повідомлення отримано. ♥</p>
       </form>
     </div>
@@ -238,13 +225,13 @@
   </div>
   <div class="wrap fin-text">
     <p class="best rv">The best race is the one<br>we run together.</p>
-    <p class="fnames rv">Anna &amp; Andrii</p>
+    <p class="fnames rv">Anna &amp;<br>Andrii</p>
     <p class="forever rv">Finish line: forever.</p>
     <p class="fsmall rv" id="finDate"></p>
   </div>
 </section>
 </main>
-<footer class="foot"><span>Anna &amp; Andrii · Wedding Grand Prix</span><a href="#top">Нагору ↑</a></footer>
+<footer class="foot"><span>Anna × Andrii · Wedding Grand Prix</span><a href="#top">Нагору ↑</a></footer>
 <script src="/app.js"></script>
 </body>
 </html>

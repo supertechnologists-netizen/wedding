@@ -122,6 +122,7 @@
       <label>Місце (назва)<input name="venueName" value="${esc(s.venueName)}"></label><label>Адреса<input name="venueAddress" value="${esc(s.venueAddress)}"></label>
       <label class="full">Посилання на карту (Google Maps тощо)<input name="mapUrl" value="${esc(s.mapUrl)}"></label>
       <label class="full">Історія / вступ<textarea name="story" rows="3">${esc(s.story)}</textarea></label>
+      <label class="full">Текст над програмою дня<textarea name="routeText" rows="2">${esc(s.routeText)}</textarea></label>
       <label>Про Аню<textarea name="brideBio" rows="4">${esc(s.brideBio)}</textarea></label><label>Про Андрія<textarea name="groomBio" rows="4">${esc(s.groomBio)}</textarea></label>
       <h3 class="full">Фото</h3>${photo('bridePhoto', 'Фото Ані')}${photo('groomPhoto', 'Фото Андрія')}${photo('couplePhoto', 'Спільне фото')}${photo('heroPhoto', 'Фон головного екрана')}
       <label class="full">Музика (URL mp3; порожньо = вбудована гоночна мелодія)<input name="musicUrl" value="${esc(s.musicUrl)}"></label>
@@ -129,7 +130,12 @@
       <label class="full">Опис<textarea name="dressText" rows="2">${esc(s.dressText)}</textarea></label>
       <label>Для неї<textarea name="dressWomen" rows="3">${esc(s.dressWomen)}</textarea></label><label>Для нього<textarea name="dressMen" rows="3">${esc(s.dressMen)}</textarea></label>
       <div class="full"><label>Кольори дрес-коду (кружечки на сайті)</label><div class="colors" id="colors"></div></div>
-      <h3 class="full">Галерея (фото з підписами-прапорцями)</h3>
+      <h3 class="full">Блок «Замість квітів» (порожній текст і список — блок прихований)</h3>
+      <label>Заголовок<input name="giftTitle" value="${esc(s.giftTitle)}"></label><label>Текст кнопки<input name="giftButton" value="${esc(s.giftButton)}"></label>
+      <label class="full">Текст<textarea name="giftText" rows="3">${esc(s.giftText)}</textarea></label>
+      <label class="full">Посилання кнопки (список побажань; порожньо — кнопки не буде)<input name="giftUrl" value="${esc(s.giftUrl)}"></label>
+      <div class="full sched" id="giftList"></div>
+      <h3 class="full">Галерея (фото з підписами)</h3>
       <div class="full sched" id="galList"></div>
       <h3 class="full">Програма дня (етапи маршруту)</h3>
       <div class="full sched" id="sched"></div><div class="full"><button type="button" class="btn sec sm" id="addStop">+ Додати етап</button></div>
@@ -145,6 +151,19 @@
     };
     drawColors(normC(s.dressColors));
     colors().onclick = e => { const b = e.target.closest('[data-rc]'); if (b) { const l = readC(); l.splice(+b.dataset.rc, 1); drawColors(l); } };
+    const gl = () => $('#giftList');
+    const readGf = () => $$('.grow', gl()).map(r => ({ title: $('input[name=gt]', r).value, image: $('input[name=gi]', r).value }));
+    const drawGf = list => {
+      gl().innerHTML = list.map((g, i) => `<div class="grow"><img src="${esc(g.image)}" alt="" onerror="this.style.visibility='hidden'"><input name="gt" placeholder="Назва подарунка" value="${esc(g.title)}"><input name="gi" placeholder="URL фото" value="${esc(g.image)}"><label class="btn sec sm" style="display:inline-grid;color:#fff;cursor:pointer">Файл<input type="file" accept="image/*" data-gfup="${i}" hidden></label><button type="button" class="btn sm danger" data-rgf="${i}">✕</button></div>`).join('') + '<div><button type="button" class="btn sec sm" id="addGf">+ Додати подарунок</button></div>';
+      $('#addGf').onclick = () => drawGf([...readGf(), { title: '', image: '' }]);
+    };
+    drawGf(s.gifts || []);
+    gl().onclick = e => { const b = e.target.closest('[data-rgf]'); if (b) { const l = readGf(); l.splice(+b.dataset.rgf, 1); drawGf(l); } };
+    gl().addEventListener('change', e => {
+      const fi = e.target.closest('[data-gfup]'); if (!fi || !fi.files[0]) return;
+      const fr = new FileReader(); fr.onload = async () => { try { const j = await api('/api/admin/upload', 'POST', { data: fr.result }); const l = readGf(); l[+fi.dataset.gfup].image = j.url; drawGf(l); toast('Файл завантажено — натисніть «Зберегти»'); } catch (x) { toast(x.message); } };
+      fr.readAsDataURL(fi.files[0]);
+    });
     const gal = () => $('#galList');
     const readG = () => $$('.grow', gal()).map(r => ({ url: $('input[name=gu]', r).value, caption: $('input[name=gc]', r).value }));
     const drawGal = list => {
@@ -172,8 +191,8 @@
       }; fr.readAsDataURL(fi.files[0]);
     });
     $('#cf').onsubmit = async e => {
-      e.preventDefault(); const f = e.target, body = { schedule: readSched(), dressColors: readC(), gallery: readG(), drinks: f.drinks.value.split('\n') };
-      for (const k of ['bride', 'groom', 'eventDate', 'rsvpDeadline', 'venueName', 'venueAddress', 'mapUrl', 'story', 'brideBio', 'groomBio', 'bridePhoto', 'groomPhoto', 'couplePhoto', 'heroPhoto', 'musicUrl', 'dressText', 'dressWomen', 'dressMen']) body[k] = f[k].value;
+      e.preventDefault(); const f = e.target, body = { schedule: readSched(), dressColors: readC(), gallery: readG(), gifts: readGf(), drinks: f.drinks.value.split('\n') };
+      for (const k of ['bride', 'groom', 'eventDate', 'rsvpDeadline', 'venueName', 'venueAddress', 'mapUrl', 'story', 'brideBio', 'groomBio', 'bridePhoto', 'groomPhoto', 'couplePhoto', 'heroPhoto', 'musicUrl', 'dressText', 'dressWomen', 'dressMen', 'routeText', 'giftTitle', 'giftText', 'giftUrl', 'giftButton']) body[k] = f[k].value;
       if (body.eventDate.length === 16) body.eventDate += ':00';
       try { const j = await api('/api/admin/settings', 'PUT', body); D.settings = j.settings; toast('Збережено ✓'); } catch (x) { toast(x.message); }
     };

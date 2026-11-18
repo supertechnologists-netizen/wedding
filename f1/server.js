@@ -61,6 +61,11 @@ const DEFAULTS = {
   rsvpDeadline: '2027-05-19',
   contactPhone: '',
   musicUrl: '',
+  routeText: 'Просимо не запізнюватися: для вас підготовлено програму, яку було б шкода пропустити. Їдьте за машинкою — вона знає дорогу.',
+  giftTitle: 'Замість квітів',
+  giftText: 'Найкращий подарунок для нас — ваша присутність. Якщо захочете подарувати щось ще, ми зібрали невеликий список побажань. Квіти, будь ласка, залиште саду: вони все одно зав’януть.',
+  giftUrl: '', giftButton: 'Обрати подарунок',
+  gifts: [{ title: 'Подорож', image: '' }, { title: 'Вечеря удвох', image: '' }, { title: 'Враження', image: '' }, { title: 'Внесок у мрію', image: '' }],
   heroPhoto: '', bridePhoto: '', groomPhoto: '', couplePhoto: '',
   brideBio: 'Аня — наш штурман: веде маршрутом, знає кожен поворот і завжди знаходить найкращу дорогу. Любить подорожі, каву на світанку і спонтанні поїздки.',
   groomBio: 'Андрій — наш пілот: швидкий розум, тверда рука і спокій на будь-якому віражі. Любить швидкість, музику і рідко пропускає Гран-прі.',
@@ -228,10 +233,11 @@ async function api(req, res, url) {
 
   if (p === '/api/admin/settings' && m === 'PUT') {
     const b = await readJSON(req, 100e3);
-    const strKeys = ['groom', 'bride', 'eventDate', 'venueName', 'venueAddress', 'mapUrl', 'rsvpDeadline', 'contactPhone', 'musicUrl', 'heroPhoto', 'bridePhoto', 'groomPhoto', 'couplePhoto', 'brideBio', 'groomBio', 'story', 'dressText', 'dressWomen', 'dressMen'];
+    const strKeys = ['groom', 'bride', 'eventDate', 'venueName', 'venueAddress', 'mapUrl', 'rsvpDeadline', 'contactPhone', 'musicUrl', 'heroPhoto', 'bridePhoto', 'groomPhoto', 'couplePhoto', 'brideBio', 'groomBio', 'story', 'dressText', 'dressWomen', 'dressMen', 'routeText', 'giftTitle', 'giftText', 'giftUrl', 'giftButton'];
     for (const k of strKeys) if (k in b) setSetting(k, str(b[k], 3000));
     if (Array.isArray(b.drinks)) setSetting('drinks', [...new Set(b.drinks.map(d => str(d, 60)).filter(Boolean))].slice(0, 40));
     if (Array.isArray(b.dressColors)) setSetting('dressColors', b.dressColors.map(c => typeof c === 'string' ? { hex: str(c, 9), name: '' } : { hex: str(c?.hex, 9), name: str(c?.name, 40) }).filter(c => /^#[0-9a-f]{3,8}$/i.test(c.hex)).slice(0, 12));
+    if (Array.isArray(b.gifts)) setSetting('gifts', b.gifts.map(g => ({ title: str(g?.title, 60), image: str(g?.image, 500) })).filter(g => g.title || g.image).slice(0, 12));
     if (Array.isArray(b.gallery)) setSetting('gallery', b.gallery.map(g => ({ url: str(g?.url, 500), caption: str(g?.caption, 60) })).filter(g => g.url || g.caption).slice(0, 12));
     if (Array.isArray(b.schedule)) setSetting('schedule', b.schedule.slice(0, 12).map(s => ({ time: str(s.time, 10), title: str(s.title, 80), text: str(s.text, 400) })).filter(s => s.title));
     return json(res, 200, { ok: true, settings: getSettings() });

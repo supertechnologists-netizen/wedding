@@ -90,47 +90,46 @@
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 
-  /* =============== INTRO =============== */
+  /* =============== LOADER =============== */
   function runIntro() {
-    const intro = $('#intro'), cols = $$('.lights .col'), txt = $('#introText');
-    let done = false, timers = [];
+    const intro = $('#intro'), lights = $$('.lights i'), txt = $('#introText');
+    let done = false; const timers = [];
     const later = (fn, ms) => timers.push(setTimeout(fn, ms));
     const finish = (instant) => {
       if (done) return; done = true; timers.forEach(clearTimeout);
       sess.set('gp_seen', '1');
-      if (instant) { intro.remove(); document.body.classList.remove('intro-on'); document.body.classList.add('go'); return; }
-      intro.classList.add('out'); document.body.classList.add('go'); document.body.classList.remove('intro-on');
-      setTimeout(() => intro.remove(), 1200);
+      document.body.classList.add('go'); document.body.classList.remove('intro-on');
+      if (instant) { intro.remove(); return; }
+      intro.classList.add('out'); setTimeout(() => intro.remove(), 1200);
     };
     $('#skipIntro').addEventListener('click', () => finish(false));
     if (reduced || location.hash.length > 1 || sess.get('gp_seen')) return finish(true);
-    cols.forEach((c, i) => later(() => { c.classList.add('on'); Audio_.beep(); txt.textContent = (i + 1) + ' / 5'; }, 700 + i * 750));
-    const hold = 700 + 5 * 750 + 900 + Math.random() * 900;
-    later(() => { cols.forEach(c => c.classList.remove('on')); txt.textContent = 'LIGHTS OUT AND AWAY WE GO!'; txt.classList.add('go'); Audio_.go(); }, hold);
-    later(() => finish(false), hold + 900);
+    lights.forEach((l, i) => later(() => { l.classList.add('on'); Audio_.beep(); }, 600 + i * 520));
+    const hold = 600 + 5 * 520 + 500 + Math.random() * 600;
+    later(() => { lights.forEach(l => l.classList.remove('on')); txt.textContent = 'Lights out and away we go!'; txt.classList.add('go'); Audio_.go(); }, hold);
+    later(() => finish(false), hold + 800);
   }
 
   /* =============== CONTENT =============== */
   const FLAGS = ['green', 'white', 'yellow', 'blue', 'red'];
-  const FLAGNAME = { green: 'Green flag', white: 'White flag', yellow: 'Yellow flag', blue: 'Blue flag', red: 'Red flag' };
   const flagSvg = n => `<svg viewBox="0 0 36 24"><use href="#flag-${n}"/></svg>`;
   const colors = () => (S.dressColors || []).map(c => typeof c === 'string' ? { hex: c, name: '' } : c);
   function photoInto(box, url, alt) {
     if (!url) return;
     const img = new Image(); img.alt = alt; img.loading = 'lazy'; img.src = url; box.prepend(img);
-    const m = $('.mono', box); if (m) m.style.display = 'none';
+    const m = $('.mount', box); if (m) m.style.display = 'none';
     box.removeAttribute('data-ph');
   }
   function fill() {
     const bride = S.bride || 'Аня', groom = S.groom || 'Андрій';
     const lat = x => x.toUpperCase().replace('АНЯ', 'ANNA').replace('АНДРІЙ', 'ANDRII');
     $('#nBride').textContent = lat(bride); $('#nGroom').textContent = lat(groom);
-    document.title = `${lat(bride)} & ${lat(groom)} · Запрошення на весілля`;
+    document.title = `${lat(bride)} × ${lat(groom)} · Wedding Grand Prix`;
     const d = new Date(S.eventDate), valid = !isNaN(d);
     const dateStr = valid ? fmtDate(d, { day: 'numeric', month: 'long', year: 'numeric' }) : '';
-    $('#heroDate').textContent = dateStr; $('#tagDate').textContent = valid ? fmtDate(d, { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
-    $('#finDate').textContent = dateStr + (S.venueName ? ' · ' + S.venueName : '');
+    $('#heroDate').textContent = valid ? fmtDate(d, { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '.') : '';
     $('#heroVenue').textContent = S.venueName || '';
+    $('#finDate').textContent = dateStr + (S.venueName ? ' · ' + S.venueName : '');
     $('#vDate').textContent = valid ? fmtDate(d, { day: 'numeric', month: 'long' }) : '';
     $('#vTime').textContent = valid ? fmtDate(d, { hour: '2-digit', minute: '2-digit', hour12: false }) : '';
     $('#vName').textContent = S.venueName || ''; $('#vAddr').textContent = S.venueAddress || '';
@@ -139,27 +138,42 @@
     if (q) $('#mapFrame').src = 'https://www.google.com/maps?q=' + encodeURIComponent(q) + '&output=embed&hl=uk'; else $('.vmap').hidden = true;
     if (S.rsvpDeadline) { const dl = new Date(S.rsvpDeadline + 'T12:00:00'); $('#vDeadline').innerHTML = isNaN(dl) ? '' : `Будь ласка, підтвердіть участь до <b>${fmtDate(dl, { day: 'numeric', month: 'long' })}</b>`; }
     $('#story').textContent = S.story || '';
-    photoInto($('#heroArch'), S.heroPhoto || S.couplePhoto, 'Аня та Андрій');
+    photoInto($('#heroPhoto'), S.heroPhoto || S.couplePhoto, 'Аня та Андрій');
     for (const [id, bio, photo, name] of [['#dBride', S.brideBio, S.bridePhoto, bride], ['#dGroom', S.groomBio, S.groomPhoto, groom]]) {
       const el = $(id); $('.bio', el).textContent = bio || ''; $('h3', el).textContent = name;
       const ph = $('.photo', el); ph.dataset.ph = name.charAt(0); photoInto(ph, photo, name);
     }
+    // faces on the car
+    [['#face1', S.bridePhoto], ['#face2', S.groomPhoto]].forEach(([id, url]) => { const f = $(id); if (url) { f.style.backgroundImage = `url("${url.replace(/"/g, '%22')}")`; f.classList.add('has'); } });
+    // route
+    $('#routeText').textContent = S.routeText || '';
+    $('#tlItems').innerHTML = (S.schedule || []).map((it, i) => `<article class="ti rv" data-i="${i}"><span class="fl">${flagSvg(FLAGS[i % 5])}</span><div class="tm">${esc(it.time || '')}</div><h3>${esc(it.title)}</h3><p>${esc(it.text || '')}</p></article>`).join('');
+    // gallery
     const gal = (S.gallery || []).filter(g => g.url || g.caption);
     $('#gallery').hidden = !gal.length;
-    $('#gal').innerHTML = gal.map((g, i) => `<figure class="gi rv ${g.url ? '' : 'empty'}">${g.url ? `<img src="${esc(g.url)}" alt="${esc(g.caption)}" loading="lazy">` : ''}${g.caption ? `<figcaption class="cap">${flagSvg(i % 6 === 5 ? 'chk' : FLAGS[i % 5])}${esc(g.caption)}</figcaption>` : ''}</figure>`).join('');
+    $('#gal').innerHTML = gal.map((g, i) => `<figure class="gi">${g.url ? `<img src="${esc(g.url)}" alt="${esc(g.caption)}" loading="lazy">` : ''}${g.caption ? `<figcaption class="cap">${flagSvg(i % 6 === 5 ? 'chk' : FLAGS[i % 5])}${esc(g.caption)}</figcaption>` : ''}</figure>`).join('');
+    // dress
     $('#dressText').textContent = S.dressText || ''; $('#dressW').textContent = S.dressWomen || ''; $('#dressM').textContent = S.dressMen || '';
     const sw = $('#swatches');
     sw.innerHTML = colors().map((c, i) => `<div class="sw" role="listitem" tabindex="0" data-i="${i}"><i style="background:${esc(c.hex)}"></i><span>${esc(c.name || c.hex)}</span></div>`).join('');
     const pick = el => { $$('.sw', sw).forEach(x => x.classList.toggle('sel', x === el)); const c = colors()[+el.dataset.i]; $('#swPicked').innerHTML = `Вибраний колір: <b>${esc(c.name || c.hex)}</b> · ${esc(c.hex)}`; Audio_.tick(); };
     sw.addEventListener('click', e => { const el = e.target.closest('.sw'); if (el) pick(el); });
     sw.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('sw')) { e.preventDefault(); pick(e.target); } });
+    // gifts
+    const gifts = (S.gifts || []).filter(g => g.title || g.image);
+    const showGift = !!(S.giftText || gifts.length);
+    $('#gift').hidden = !showGift;
+    if (S.giftTitle) $('#giftTitle').innerHTML = esc(S.giftTitle).replace(/\s+/, '<br>');
+    $('#giftText').textContent = S.giftText || '';
+    $('#gifts').hidden = !gifts.length;
+    $('#gifts').innerHTML = gifts.map(g => `<div class="gf">${g.image ? `<img src="${esc(g.image)}" alt="${esc(g.title)}" loading="lazy">` : ''}${g.title ? `<span>${esc(g.title)}</span>` : ''}</div>`).join('');
+    const gb = $('#giftBtn'); if (S.giftUrl) { gb.href = S.giftUrl; gb.textContent = S.giftButton || 'Обрати подарунок'; } else gb.hidden = true;
     $('#drinkChips').innerHTML = (S.drinks || []).map(x => `<label><input type="checkbox" name="drink" value="${esc(x)}"><span>${esc(x)}</span></label>`).join('');
-    $('#stops').innerHTML = (S.schedule || []).map((it, i) => `<article class="stop rv" data-i="${i}"><span class="chip">${flagSvg(FLAGS[i % 5])}${esc(it.time || '')} · ${FLAGNAME[FLAGS[i % 5]]}</span><h3>${esc(it.title)}</h3><p>${esc(it.text || '')}</p></article>`).join('');
     if (guest) {
       const first = guest.name.split(' ')[0];
       $('#greet').innerHTML = `Особисто для вас, <b>${esc(guest.name)}</b>`;
       $('#rsvpLead').textContent = `${first}, дайте нам знати, чи будете ви поруч. Це займе хвилину.` + (guest.responded ? ' Ви вже відповіли — за потреби змініть відповідь.' : '');
-    } else $('#greet').textContent = 'Дорогі гості,';
+    } else $('#greet').textContent = 'Дорогі гості, ви запрошені';
   }
 
   /* =============== COUNTDOWN =============== */
@@ -196,75 +210,23 @@
     } };
   })();
 
-  /* =============== ROAD (aerial circuit-style road with one car) =============== */
-  const Road = (() => {
-    const sec = $('#route'), svg = $('#road'), NS = 'http://www.w3.org/2000/svg', car = $('#car');
-    let pts = [], marks = [], y0 = 0, y1 = 0, yMax = 0, built = false, cy = 0, lastY = null, mob = false, timer, arrived = false, noiseDone = false;
-    const mk = (t, a, p) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; };
-    function noise() {
-      if (noiseDone) return; noiseDone = true;
-      const c = document.createElement('canvas'); c.width = c.height = 160; const x = c.getContext('2d'), im = x.createImageData(160, 160);
-      for (let i = 0; i < im.data.length; i += 4) { const v = Math.random(); const g = v > .72 ? 255 : 0; im.data[i] = im.data[i + 1] = im.data[i + 2] = g; im.data[i + 3] = g ? 20 + Math.random() * 40 : 0; }
-      x.putImageData(im, 0, 0); $('#noiseImg').setAttribute('href', c.toDataURL());
+  /* =============== TIMELINE (dashed line + car with the couple) =============== */
+  const Timeline = (() => {
+    const tl = $('#tl'), car = $('#car'); let cy = 0, started = false, arrived = false, lastY = 0;
+    function place() {
+      const items = $$('.ti', tl); if (!items.length) return;
+      const r = tl.getBoundingClientRect(), H = r.height, maxY = H - 34;
+      const target = clamp(-r.top + innerHeight * .5, 0, maxY);
+      if (!started) { cy = target; started = true; }
+      cy += (target - cy) * (reduced ? 1 : .12); if (Math.abs(target - cy) < .3) cy = target;
+      car.style.transform = `translate3d(0,${cy.toFixed(1)}px,0)`;
+      car.classList.toggle('show', r.top < innerHeight && r.bottom > 0);
+      items.forEach(it => { const y = it.offsetTop + 22, on = cy >= y - 6; if (on !== it.classList.contains('active')) { it.classList.toggle('active', on); if (on) Audio_.stop(); } });
+      const done = cy >= maxY - 3;
+      if (done && !arrived) { arrived = true; Audio_.finish(); Confetti.burst(.5, .5); }
+      if (!done && cy < maxY - 160) arrived = false;
     }
-    function build() {
-      noise();
-      const W = sec.clientWidth, H = sec.clientHeight; mob = W < 860;
-      svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('width', W); svg.setAttribute('height', H);
-      const rw = mob ? 50 : 140, k = mob ? 10 : 15, cx = mob ? 40 : W / 2, A = mob ? 12 : 64, P = mob ? 520 : 900;
-      svg.style.setProperty('--rw', rw + 'px'); svg.style.setProperty('--k', k + 'px'); svg.style.setProperty('--kd', (mob ? 14 : 22) + 'px');
-      car.style.setProperty('--cw', (mob ? 64 : 104) + 'px');
-      const stopsEl = $('#stops'), endEl = $('#venueEnd');
-      const edge = rw / 2 + 6 + k;                       // distance from road centre to outer kerb edge
-      const gap = A + edge + 34;
-      if (mob) stopsEl.style.setProperty('--ml', (cx + A + edge + 40 - stopsEl.offsetLeft) + 'px'); else stopsEl.style.setProperty('--gap', gap + 'px');
-      y0 = stopsEl.offsetTop - 6; y1 = endEl.offsetTop + 54; yMax = y1 - (mob ? 44 : 62);
-      const xAt = y => cx + A * Math.sin((y - y0) / P * 2 * Math.PI);
-      pts = [];
-      for (let y = y0; y <= y1 + 40; y += 6) pts.push({ x: xAt(y), y });
-      const d = 'M' + pts.map(q => q.x.toFixed(1) + ' ' + q.y.toFixed(1)).join('L');
-      for (const id of ['rShadow', 'rKerbR', 'rKerbW', 'rConc', 'rWhite', 'rAsph', 'rNoise', 'rRubber']) $('#' + id).setAttribute('d', d);
-      // chequered finish line across the road
-      const f = $('#rFinish'); f.innerHTML = ''; const fx = xAt(y1 - 8), sq = rw / 10;
-      for (let r = 0; r < 2; r++) for (let c = 0; c < 10; c++) mk('rect', { x: fx - rw / 2 + c * sq, y: y1 - 8 - sq * 1.2 + r * sq, width: sq, height: sq, fill: (r + c) % 2 ? '#fff' : '#111' }, f);
-      // flag signs next to the road
-      const g = $('#rMarks'); g.innerHTML = ''; marks = [];
-      $$('.stop', stopsEl).forEach((el, i) => {
-        const my = stopsEl.offsetTop + el.offsetTop + 26, right = mob ? true : i % 2 === 0, rr = mob ? 12 : 17;
-        const mx = xAt(my) + (right ? 1 : -1) * (edge + rr + 4);
-        const target = mob ? cx + A + edge + 40 : W / 2 + (right ? 1 : -1) * gap;
-        const gg = mk('g', { class: 'mk' }, g);
-        mk('line', { x1: mx, y1: my, x2: target, y2: my }, gg);
-        mk('circle', { cx: mx, cy: my, r: rr }, gg);
-        mk('use', { href: '#flag-' + FLAGS[i % 5], x: mx - rr * .68, y: my - rr * .45, width: rr * 1.36, height: rr * .9 }, gg);
-        marks.push({ y: my, g: gg, el });
-      });
-      built = true; place(true);
-    }
-    function place(force) {
-      if (!built) return;
-      const r = sec.getBoundingClientRect();
-      const inView = r.top < innerHeight && r.bottom > 0;
-      const targetY = clamp(-r.top + innerHeight * .55, y0, yMax);
-      if (lastY === null || force) cy = lastY === null ? targetY : cy;
-      cy += (targetY - cy) * (reduced ? 1 : .1); if (Math.abs(targetY - cy) < .3) cy = targetY;
-      const v = cy - (lastY ?? cy); lastY = cy;
-      const i = Math.min(pts.length - 2, Math.max(0, Math.floor((cy - y0) / 6)));
-      const a = pts[i], b = pts[i + 1], t = clamp((cy - a.y) / (b.y - a.y || 1), 0, 1);
-      const x = a.x + (b.x - a.x) * t;
-      const ang = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI;
-      car.style.transform = `translate3d(${x.toFixed(1)}px,${cy.toFixed(1)}px,0) rotate(${ang.toFixed(2)}deg)`;
-      car.style.setProperty('--tr', Math.min(.9, Math.abs(v) / 6).toFixed(2));
-      car.classList.toggle('show', inView && targetY > y0 + 6);
-      marks.forEach(m => { const on = cy >= m.y - 4; if (on !== m.g.classList.contains('on')) { m.g.classList.toggle('on', on); m.el.classList.toggle('active', on); if (on) Audio_.stop(); } });
-      const done = cy >= yMax - 2;
-      if (done && !arrived) { arrived = true; $('.vcard').classList.add('arrived'); Audio_.finish(); Confetti.burst(.5, .55); }
-      if (!done && arrived && cy < yMax - 120) { arrived = false; $('.vcard').classList.remove('arrived'); }
-    }
-    return {
-      init() { build(); new ResizeObserver(() => { clearTimeout(timer); timer = setTimeout(build, 120); }).observe(sec); addEventListener('load', build); },
-      frame: () => place()
-    };
+    return { frame: place, init() { place(); addEventListener('resize', place); } };
   })();
 
   /* =============== RSVP =============== */
@@ -330,22 +292,20 @@
     const nav = $('#nav'), burger = $('#burger'), menu = $('#menu');
     burger.addEventListener('click', () => { const o = menu.classList.toggle('open'); burger.setAttribute('aria-expanded', o); });
     menu.addEventListener('click', e => { if (e.target.closest('a')) { menu.classList.remove('open'); burger.setAttribute('aria-expanded', false); } });
+    $('#vinyl').addEventListener('click', () => $('#btnMusic').click());
+    new MutationObserver(() => { const on = $('#btnMusic').getAttribute('aria-pressed') === 'true'; document.body.classList.toggle('music-on', on); $('#vinyl').setAttribute('aria-pressed', on); }).observe($('#btnMusic'), { attributes: true, attributeFilter: ['aria-pressed'] });
     const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .12, rootMargin: '0px 0px -6% 0px' });
     $$('.rv').forEach(e => io.observe(e));
     const fin = $('#finish');
     new IntersectionObserver((es, o) => { if (es[0].isIntersecting) { fin.classList.add('run'); setTimeout(() => Audio_.finish(), 1800); o.disconnect(); } }, { threshold: .35 }).observe(fin);
     let ticking = false;
     const loop = () => {
-      nav.classList.toggle('solid', scrollY > 40);
-      document.documentElement.style.setProperty('--sx', -(scrollY * .35 % 56) + 'px');
       nav.style.setProperty('--prog', (scrollY / Math.max(1, document.documentElement.scrollHeight - innerHeight) * 100) + '%');
-      Road.frame();
-      ticking = false;
+      Timeline.frame(); ticking = false;
     };
     const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(loop); } };
     addEventListener('scroll', onScroll, { passive: true }); addEventListener('resize', onScroll);
-    // keep easing smooth after scroll stops
-    setInterval(() => { Road.frame(); }, 60);
+    setInterval(() => Timeline.frame(), 60);
     loop();
   }
 
@@ -355,7 +315,7 @@
       const r = await fetch('/api/site' + (urlCode ? '?g=' + encodeURIComponent(urlCode) : ''), { cache: 'no-store' });
       const j = await r.json(); S = j.settings; guest = j.guest;
     } catch { S = { schedule: [], drinks: [], dressColors: [] }; }
-    fill(); countdown(); rsvp(); Road.init(); chrome(); runIntro();
+    fill(); countdown(); rsvp(); Timeline.init(); chrome(); runIntro();
     if (location.hash.length > 1) setTimeout(() => { const t = document.querySelector(location.hash); t && t.scrollIntoView(); }, 50);
   })();
 })();
