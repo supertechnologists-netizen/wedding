@@ -176,56 +176,94 @@
     tick(); setInterval(tick, 1000);
   }
 
-  /* =============== ROAD (wavy road with the car) =============== */
+  /* =============== CONFETTI =============== */
+  const Confetti = (() => {
+    const cv = $('#confetti'), cx = cv.getContext('2d'); let parts = [], raf = 0;
+    const COL = ['#d6001c', '#ffffff', '#1c1b1a', '#b8985a', '#f4e3b5'];
+    const size = () => { cv.width = innerWidth * devicePixelRatio; cv.height = innerHeight * devicePixelRatio; };
+    function tick() {
+      cx.clearRect(0, 0, cv.width, cv.height);
+      parts.forEach(q => { q.vy += .12; q.x += q.vx; q.y += q.vy; q.r += q.vr; q.vx *= .995;
+        cx.save(); cx.translate(q.x, q.y); cx.rotate(q.r); cx.fillStyle = q.c; cx.globalAlpha = Math.min(1, q.life / 40); cx.fillRect(-q.w / 2, -q.h / 2, q.w, q.h); cx.restore(); q.life--; });
+      parts = parts.filter(q => q.life > 0 && q.y < cv.height + 40);
+      if (parts.length) raf = requestAnimationFrame(tick); else { cx.clearRect(0, 0, cv.width, cv.height); raf = 0; }
+    }
+    return { burst(xf = .5, yf = .35) {
+      if (reduced) return; size(); const dpr = devicePixelRatio;
+      for (let i = 0; i < 150; i++) { const a = Math.random() * Math.PI * 2, v = (4 + Math.random() * 9) * dpr;
+        parts.push({ x: cv.width * xf, y: cv.height * yf, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 5 * dpr, w: (6 + Math.random() * 6) * dpr, h: (3 + Math.random() * 5) * dpr, r: Math.random() * 6, vr: (Math.random() - .5) * .4, c: COL[i % COL.length], life: 110 + Math.random() * 80 }); }
+      if (!raf) raf = requestAnimationFrame(tick);
+    } };
+  })();
+
+  /* =============== ROAD (aerial circuit-style road with one car) =============== */
   const Road = (() => {
-    const sec = $('#route'), svg = $('#road'), NS = 'http://www.w3.org/2000/svg';
-    let pts = [], cum = [], Lt = 0, marks = [], y0 = 0, y1 = 0, built = false, cy = 0, mob = false, timer;
-    const car = $('#car');
+    const sec = $('#route'), svg = $('#road'), NS = 'http://www.w3.org/2000/svg', car = $('#car');
+    let pts = [], marks = [], y0 = 0, y1 = 0, yMax = 0, built = false, cy = 0, lastY = null, mob = false, timer, arrived = false, noiseDone = false;
     const mk = (t, a, p) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; };
+    function noise() {
+      if (noiseDone) return; noiseDone = true;
+      const c = document.createElement('canvas'); c.width = c.height = 160; const x = c.getContext('2d'), im = x.createImageData(160, 160);
+      for (let i = 0; i < im.data.length; i += 4) { const v = Math.random(); const g = v > .72 ? 255 : 0; im.data[i] = im.data[i + 1] = im.data[i + 2] = g; im.data[i + 3] = g ? 20 + Math.random() * 40 : 0; }
+      x.putImageData(im, 0, 0); $('#noiseImg').setAttribute('href', c.toDataURL());
+    }
     function build() {
+      noise();
       const W = sec.clientWidth, H = sec.clientHeight; mob = W < 860;
       svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('width', W); svg.setAttribute('height', H);
-      const cx = mob ? 28 : W / 2, A = mob ? 11 : 44, P = mob ? 250 : 380, rw = mob ? 30 : 50;
-      svg.style.setProperty('--rw', rw + 'px');
+      const rw = mob ? 50 : 140, k = mob ? 10 : 15, cx = mob ? 40 : W / 2, A = mob ? 12 : 64, P = mob ? 520 : 900;
+      svg.style.setProperty('--rw', rw + 'px'); svg.style.setProperty('--k', k + 'px'); svg.style.setProperty('--kd', (mob ? 14 : 22) + 'px');
+      car.style.setProperty('--cw', (mob ? 64 : 104) + 'px');
       const stopsEl = $('#stops'), endEl = $('#venueEnd');
-      y0 = stopsEl.offsetTop - 30; y1 = endEl.offsetTop + 70;
+      const edge = rw / 2 + 6 + k;                       // distance from road centre to outer kerb edge
+      const gap = A + edge + 34;
+      if (mob) stopsEl.style.setProperty('--ml', (cx + A + edge + 40 - stopsEl.offsetLeft) + 'px'); else stopsEl.style.setProperty('--gap', gap + 'px');
+      y0 = stopsEl.offsetTop - 50; y1 = endEl.offsetTop + 54; yMax = y1 - (mob ? 44 : 62);
       const xAt = y => cx + A * Math.sin((y - y0) / P * 2 * Math.PI);
-      pts = []; cum = []; Lt = 0;
-      for (let y = y0; y <= y1; y += 8) { const q = { x: xAt(y), y }; if (pts.length) Lt += Math.hypot(q.x - pts[pts.length - 1].x, q.y - pts[pts.length - 1].y); pts.push(q); cum.push(Lt); }
+      pts = [];
+      for (let y = y0; y <= y1 + 40; y += 6) pts.push({ x: xAt(y), y });
       const d = 'M' + pts.map(q => q.x.toFixed(1) + ' ' + q.y.toFixed(1)).join('L');
-      for (const id of ['rEdge', 'rBody', 'rDash', 'rDone']) $('#' + id).setAttribute('d', d);
-      $('#rDone').style.strokeDasharray = Lt; $('#rDone').style.strokeDashoffset = Lt;
+      for (const id of ['rShadow', 'rKerbR', 'rKerbW', 'rConc', 'rWhite', 'rAsph', 'rNoise', 'rRubber']) $('#' + id).setAttribute('d', d);
+      // chequered finish line across the road
+      const f = $('#rFinish'); f.innerHTML = ''; const fx = xAt(y1 - 8), sq = rw / 10;
+      for (let r = 0; r < 2; r++) for (let c = 0; c < 10; c++) mk('rect', { x: fx - rw / 2 + c * sq, y: y1 - 8 - sq * 1.2 + r * sq, width: sq, height: sq, fill: (r + c) % 2 ? '#fff' : '#111' }, f);
+      // flag signs next to the road
       const g = $('#rMarks'); g.innerHTML = ''; marks = [];
       $$('.stop', stopsEl).forEach((el, i) => {
-        const my = stopsEl.offsetTop + el.offsetTop + 26, mx = xAt(my);
-        const cardEdge = mob ? 58 : (i % 2 === 0 ? W / 2 + 84 : W / 2 - 84);
+        const my = stopsEl.offsetTop + el.offsetTop + 26, right = mob ? true : i % 2 === 0, rr = mob ? 12 : 17;
+        const mx = xAt(my) + (right ? 1 : -1) * (edge + rr + 4);
+        const target = mob ? cx + A + edge + 40 : W / 2 + (right ? 1 : -1) * gap;
         const gg = mk('g', { class: 'mk' }, g);
-        mk('line', { x1: mx, y1: my, x2: cardEdge, y2: my }, gg);
-        mk('circle', { cx: mx, cy: my, r: mob ? 13 : 19 }, gg);
-        mk('use', { href: '#flag-' + FLAGS[i % 5], x: mx - (mob ? 9 : 13), y: my - (mob ? 6 : 8.5), width: mob ? 18 : 26, height: mob ? 12 : 17 }, gg);
+        mk('line', { x1: mx, y1: my, x2: target, y2: my }, gg);
+        mk('circle', { cx: mx, cy: my, r: rr }, gg);
+        mk('use', { href: '#flag-' + FLAGS[i % 5], x: mx - rr * .68, y: my - rr * .45, width: rr * 1.36, height: rr * .9 }, gg);
         marks.push({ y: my, g: gg, el });
       });
-      const e = $('#rEnd'); e.innerHTML = ''; const ex = xAt(y1);
-      mk('line', { x1: ex, y1: y1, x2: ex, y2: y1 - 50, stroke: '#1c1b1a', 'stroke-width': 2 }, e);
-      mk('use', { href: '#flag-chk', x: ex, y: y1 - 52, width: 38, height: 25 }, e);
-      built = true; place();
+      built = true; place(true);
     }
-    function place() {
+    function place(force) {
       if (!built) return;
       const r = sec.getBoundingClientRect();
-      const targetY = clamp(-r.top + innerHeight * .55, y0, y1);
-      cy += (targetY - cy) * (reduced ? 1 : .14); if (Math.abs(targetY - cy) < .3) cy = targetY;
-      const i = Math.min(pts.length - 2, Math.max(0, Math.floor((cy - y0) / 8)));
+      const inView = r.top < innerHeight && r.bottom > 0;
+      const targetY = clamp(-r.top + innerHeight * .55, y0, yMax);
+      if (lastY === null || force) cy = lastY === null ? targetY : cy;
+      cy += (targetY - cy) * (reduced ? 1 : .1); if (Math.abs(targetY - cy) < .3) cy = targetY;
+      const v = cy - (lastY ?? cy); lastY = cy;
+      const i = Math.min(pts.length - 2, Math.max(0, Math.floor((cy - y0) / 6)));
       const a = pts[i], b = pts[i + 1], t = clamp((cy - a.y) / (b.y - a.y || 1), 0, 1);
-      const x = a.x + (b.x - a.x) * t, len = cum[i] + (cum[i + 1] - cum[i]) * t;
+      const x = a.x + (b.x - a.x) * t;
       const ang = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI;
-      car.setAttribute('transform', `translate(${x} ${cy}) rotate(${ang}) scale(${mob ? .78 : 1})`);
-      $('#rDone').style.strokeDashoffset = Lt - len;
+      car.style.transform = `translate3d(${x.toFixed(1)}px,${cy.toFixed(1)}px,0) rotate(${ang.toFixed(2)}deg)`;
+      car.style.setProperty('--tr', Math.min(.9, Math.abs(v) / 6).toFixed(2));
+      car.classList.toggle('show', inView || cy > y0 + 4);
       marks.forEach(m => { const on = cy >= m.y - 4; if (on !== m.g.classList.contains('on')) { m.g.classList.toggle('on', on); m.el.classList.toggle('active', on); if (on) Audio_.stop(); } });
+      const done = cy >= yMax - 2;
+      if (done && !arrived) { arrived = true; $('.vcard').classList.add('arrived'); Audio_.finish(); Confetti.burst(.5, .55); }
+      if (!done && arrived && cy < yMax - 120) { arrived = false; $('.vcard').classList.remove('arrived'); }
     }
     return {
       init() { build(); new ResizeObserver(() => { clearTimeout(timer); timer = setTimeout(build, 120); }).observe(sec); addEventListener('load', build); },
-      frame: place
+      frame: () => place()
     };
   })();
 
@@ -267,7 +305,7 @@
         $('#doneTitle').textContent = att === 'yes' ? 'Ви на старті!' : 'Дякуємо, що повідомили';
         $('#doneText').textContent = att === 'yes' ? `${first}, ми запишемо вас до стартової решітки. Побачимось ${$('#heroDate').textContent}!` : `${first}, нам шкода, що ви не зможете бути поруч, але дякуємо за відповідь. Ми завжди про вас пам’ятаємо.`;
         f.hidden = true; $('#rsvpDone').hidden = false; $('#rsvpDone').scrollIntoView({ behavior: 'smooth', block: 'center' });
-        Audio_.finish();
+        Audio_.finish(); Confetti.burst(.5, .4);
       } catch (x) { err.textContent = x.message || 'Не вдалося надіслати. Спробуйте ще раз.'; err.hidden = false; }
       btn.disabled = false;
     });

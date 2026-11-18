@@ -24,14 +24,20 @@
   <symbol id="flag-red" viewBox="0 0 36 24"><path d="M0 2C9-2 15 6 24 2S33 6 36 2V22C27 26 21 18 12 22S3 18 0 22Z" fill="#d6001c"/></symbol>
   <symbol id="flag-white" viewBox="0 0 36 24"><path d="M0 2C9-2 15 6 24 2S33 6 36 2V22C27 26 21 18 12 22S3 18 0 22Z" fill="#fff" stroke="#1c1b1a" stroke-width="1.3"/></symbol>
   <symbol id="flag-chk" viewBox="0 0 36 24"><path d="M0 2C9-2 15 6 24 2S33 6 36 2V22C27 26 21 18 12 22S3 18 0 22Z" fill="url(#chk6)" stroke="#1c1b1a" stroke-width="1.3"/></symbol>
-  <symbol id="f1car" viewBox="-30 -14 60 28" overflow="visible">
-    <rect x="-29" y="-11" width="6" height="22" rx="1" fill="#1c1b1a"/><rect x="-29" y="-11" width="6" height="4" fill="#fff"/>
-    <rect x="-22" y="-10" width="9" height="5.5" rx="1.5" fill="#000"/><rect x="-22" y="4.5" width="9" height="5.5" rx="1.5" fill="#000"/>
-    <path d="M-23-3.2H12c6 0 10 2 18 3.2-8 1.2-12 3.2-18 3.2H-23Z" fill="#d6001c"/>
-    <rect x="-20" y="-1" width="34" height="2" fill="#fff" opacity=".9"/>
-    <rect x="8" y="-10" width="9" height="5.5" rx="1.5" fill="#000"/><rect x="8" y="4.5" width="9" height="5.5" rx="1.5" fill="#000"/>
-    <ellipse cx="-3" cy="0" rx="5" ry="3" fill="#1c1b1a"/><circle cx="-3" cy="0" r="1.8" fill="#fff"/>
-    <rect x="24" y="-10" width="5" height="20" rx="1" fill="#1c1b1a"/><rect x="24" y="-10" width="5" height="3.5" fill="#d6001c"/>
+  <linearGradient id="carGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff3a2c"/><stop offset=".5" stop-color="#d6001c"/><stop offset="1" stop-color="#8e0013"/></linearGradient>
+  <symbol id="f1car" viewBox="-50 -22 100 44" overflow="visible">
+    <rect x="-49" y="-19" width="9" height="38" rx="1.5" fill="#15151a"/><rect x="-49" y="-19" width="9" height="4" fill="#d6001c"/><rect x="-49" y="15" width="9" height="4" fill="#d6001c"/>
+    <rect x="-36" y="-22" width="22" height="11" rx="4" fill="#0c0c0e"/><rect x="-36" y="11" width="22" height="11" rx="4" fill="#0c0c0e"/>
+    <rect x="-33" y="-20.5" width="16" height="1.6" rx=".8" fill="#34343a"/><rect x="-33" y="18.9" width="16" height="1.6" rx=".8" fill="#34343a"/>
+    <path d="M-22-10-25-12M-22 10-25 12M20-8 22-12M20 8 22 12" stroke="#15151a" stroke-width="1.5"/>
+    <path d="M-40-4.5C-30-6-22-14-8-14C0-14 4-7 12-4C24-2.5 34-2 44-1.2V1.2C34 2 24 2.5 12 4C4 7 0 14-8 14C-22 14-30 6-40 4.5Z" fill="url(#carGrad)"/>
+    <path d="M-6-12.5C-2-12.5 0-10 0-8L-8-9Z M-6 12.5C-2 12.5 0 10 0 8L-8 9Z" fill="#150507" opacity=".85"/>
+    <rect x="-38" y="-1.1" width="36" height="2.2" fill="#fff" opacity=".92"/><rect x="26" y="-1.1" width="14" height="2.2" fill="#fff" opacity=".85"/>
+    <rect x="10" y="-19" width="19" height="10" rx="3.5" fill="#0c0c0e"/><rect x="10" y="9" width="19" height="10" rx="3.5" fill="#0c0c0e"/>
+    <rect x="12" y="-17.6" width="13" height="1.5" rx=".7" fill="#34343a"/><rect x="12" y="16.1" width="13" height="1.5" rx=".7" fill="#34343a"/>
+    <rect x="40" y="-18" width="7" height="36" rx="1.5" fill="#15151a"/><rect x="40" y="-18" width="7" height="3.5" fill="#d6001c"/><rect x="40" y="14.5" width="7" height="3.5" fill="#d6001c"/>
+    <ellipse cx="-4" cy="0" rx="7" ry="4" fill="#111"/><circle cx="-3" cy="0" r="2.8" fill="#fff"/><circle cx="-3" cy="0" r="1.2" fill="#d6001c"/>
+    <path d="M-9-3.6C-3-6 3-3 4 0C3 3-3 6-9 3.6" fill="none" stroke="#2a2a30" stroke-width="1.3"/>
   </symbol>
 </defs></svg>
 
@@ -58,6 +64,7 @@
   <button id="btnSfx" type="button" title="Звукові ефекти" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4Zm12 0a4 4 0 0 1 0 6m2.5-9a8 8 0 0 1 0 12"/></svg><b>Ефекти</b></button>
 </div>
 
+<canvas id="confetti" aria-hidden="true"></canvas>
 <main id="top">
 <!-- ============ PREVIEW ============ -->
 <section class="hero" id="hero">
@@ -66,8 +73,9 @@
       <p class="greet" id="greet"></p>
       <p class="tagline"><svg viewBox="0 0 36 24"><use href="#flag-chk"/></svg>Wedding Grand Prix</p>
       <h1 class="names"><span id="nBride">ANNA</span><em>&amp;</em><span id="nGroom">ANDRII</span></h1>
-      <p class="invite">запрошують вас розділити з ними найважливіший день</p>
-      <div class="hero-meta"><span id="heroDate"></span><i></i><span id="heroVenue"></span></div>
+      <p class="invite">з радістю запрошують вас розділити з ними найурочистіший день у їхньому житті</p>
+      <div class="hero-date"><span class="ln"></span><b id="heroDate"></b><span class="ln"></span></div>
+      <div class="hero-meta"><span id="heroVenue"></span></div>
       <p class="lights-line">Lights out and away we go!</p>
       <a href="#about" class="btn" data-sfx="rev">Дізнатися більше <svg viewBox="0 0 24 24"><path d="M12 5v14m-6-6 6 6 6-6"/></svg></a>
     </div>
@@ -112,10 +120,12 @@
 <!-- ============ ROAD / PROGRAM / VENUE ============ -->
 <section class="journey" id="route">
   <svg id="road" aria-hidden="true">
-    <path id="rEdge" class="r-edge"/><path id="rBody" class="r-body"/><path id="rDash" class="r-dash"/><path id="rDone" class="r-done"/>
-    <g id="rMarks"></g><g id="rEnd"></g>
-    <g id="car"><use href="#f1car" width="52" height="24" x="-26" y="-12"/></g>
+    <defs><pattern id="noise" patternUnits="userSpaceOnUse" width="160" height="160"><image id="noiseImg" width="160" height="160"/></pattern></defs>
+    <path id="rShadow" class="r-shadow"/><path id="rKerbR" class="r-kerb r"/><path id="rKerbW" class="r-kerb w"/><path id="rConc" class="r-conc"/><path id="rWhite" class="r-white"/>
+    <path id="rAsph" class="r-asph"/><path id="rNoise" class="r-noise"/><path id="rRubber" class="r-rubber"/>
+    <g id="rFinish"></g><g id="rMarks"></g>
   </svg>
+  <div id="car" class="carbox" aria-hidden="true"><div class="trail"></div><svg viewBox="-50 -22 100 44"><use href="#f1car" x="-50" y="-22" width="100" height="44"/></svg></div>
   <div class="wrap jhead">
     <p class="eyebrow rv">Програма дня</p>
     <h2 class="rv">Дорога до <em>свята</em></h2>
@@ -224,7 +234,7 @@
 <section class="finish" id="finish">
   <div class="flag-field" aria-hidden="true"><div class="flag f1"></div><div class="flag f2"></div></div>
   <div class="finish-road" aria-hidden="true"><div class="line"></div>
-    <svg class="fcar" viewBox="0 0 60 28"><use href="#f1car" x="0" y="0" width="60" height="28"/></svg>
+    <svg class="fcar" viewBox="-50 -22 100 44"><use href="#f1car" x="-50" y="-22" width="100" height="44"/></svg>
   </div>
   <div class="wrap fin-text">
     <p class="best rv">The best race is the one<br>we run together.</p>
