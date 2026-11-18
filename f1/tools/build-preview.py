@@ -1,8 +1,11 @@
 # Builds /tmp/preview.html: a static copy of the site (no DB) to publish as an Artifact preview.
-# Usage: python3 f1/tools/build-preview.py  ->  then publish /tmp/preview.html with the Artifact tool (same file_path keeps the URL).
-import json, re, subprocess, time, os, urllib.request
+# Usage: python3 f1/tools/build-preview.py [OUT_DIR]  ->  OUT_DIR/preview.html + OUT_DIR/img/*.svg
+# Publish preview.html with the Artifact tool and pass the img/ files via `files` (same file_path keeps the URL).
+import json, re, subprocess, time, os, sys, shutil, urllib.request
 base = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'public') + '/'
-sp = '/tmp/'
+sp = (sys.argv[1] if len(sys.argv) > 1 else '/tmp').rstrip('/') + '/'
+os.makedirs(sp + 'img', exist_ok=True)
+for f in os.listdir(base + 'img'): shutil.copy(base + 'img/' + f, sp + 'img/' + f)
 
 # get default settings from a throw-away server instance
 env = dict(os.environ, PORT='3122', ADMIN_PASSWORD='x', DATA_DIR='/tmp/gpdata_prev')
@@ -32,12 +35,12 @@ shim = '''(function(){
     if (u.indexOf('/api/wish') === 0) return jr({ok:true});
     return realFetch(u,o);
   };
-})();''' % json.dumps(settings, ensure_ascii=False)
+})();''' % json.dumps(settings, ensure_ascii=False).replace('"/img/', '"img/')
 
 out = '''<title>Anna and Andrii Wedding</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="Wedding Grand Prix: приглашение на свадьбу Ани и Андрія">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,600&display=swap">
 <style>
 ''' + css + '''
 .vmap{display:none!important}
