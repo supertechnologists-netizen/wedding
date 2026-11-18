@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Pit Wall · Адмін-панель</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<style>
+:root{--red:#e10600;--bk:#0a0a0c;--ink:#131318;--line:#2a2a31;--gr:#9a9aa5;--ok:#35d07f;--h:'Barlow Condensed','Arial Narrow',Impact,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bk);color:#fff;font:15px/1.5 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;min-height:100vh}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3{font-family:var(--h);font-style:italic;text-transform:uppercase;font-weight:800;letter-spacing:.02em}
+.hide{display:none!important}
+.login{min-height:100vh;display:grid;place-items:center;padding:20px}
+.login form{background:var(--ink);border:1px solid var(--line);border-top:4px solid var(--red);padding:32px;width:min(380px,100%);display:grid;gap:16px}
+.login h1{font-size:40px}
+input,select,textarea{width:100%;background:#000;border:1px solid var(--line);padding:11px 12px;border-radius:4px;outline:0}
+input:focus,select:focus,textarea:focus{border-color:var(--red)}
+textarea{resize:vertical}
+label{display:grid;gap:5px;font-size:13px;color:var(--gr)}
+.btn{background:var(--red);padding:10px 18px;border-radius:4px;font-weight:700;border:0;cursor:pointer;min-height:42px}
+a.btn{color:#fff;display:inline-flex;align-items:center}.btn:hover{filter:brightness(1.15)}.btn.sec{background:#26262d}.btn.sm{padding:6px 12px;min-height:34px;font-size:13px}.btn.danger{background:#5a1210}
+.err{color:#ff7a72}.ok{color:var(--ok)}
+header{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 20px;background:var(--ink);border-bottom:2px solid var(--red);position:sticky;top:0;z-index:5;flex-wrap:wrap}
+header h1{font-size:28px}header h1 b{color:var(--red)}
+nav{display:flex;gap:4px;flex-wrap:wrap}
+nav button{background:none;border:0;padding:9px 14px;cursor:pointer;font:800 16px var(--h);font-style:italic;text-transform:uppercase;letter-spacing:.08em;color:var(--gr);border-bottom:3px solid transparent}
+nav button.on{color:#fff;border-color:var(--red)}
+main{max-width:1200px;margin:0 auto;padding:22px 16px 60px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:22px}
+.tile{background:var(--ink);border:1px solid var(--line);border-top:3px solid var(--red);padding:16px}
+.tile b{display:block;font:800 44px/1 var(--h);font-style:italic}.tile span{color:var(--gr);font-size:13px}
+.tile.g{border-top-color:var(--ok)}.tile.w{border-top-color:#f0b429}.tile.n{border-top-color:#777}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:800px){.grid2{grid-template-columns:1fr}}
+.panel{background:var(--ink);border:1px solid var(--line);padding:18px;margin-bottom:16px}
+.panel h3{font-size:22px;margin-bottom:12px}
+.donut{display:flex;gap:22px;align-items:center;flex-wrap:wrap}
+.donut i{width:150px;height:150px;border-radius:50%;display:block;position:relative;flex:none}
+.donut i::after{content:"";position:absolute;inset:32px;background:var(--ink);border-radius:50%}
+.legend{display:grid;gap:6px}.legend span::before{content:"";display:inline-block;width:12px;height:12px;margin-right:8px;background:var(--c);vertical-align:-1px}
+.bars{display:grid;gap:8px}.bar{display:grid;grid-template-columns:130px 1fr 34px;gap:10px;align-items:center;font-size:14px}
+.bar div{height:16px;background:#000;border:1px solid var(--line)}.bar div i{display:block;height:100%;background:linear-gradient(90deg,var(--red),#ff5a50)}
+.bar em{font-style:normal;text-align:right;font-weight:700}
+.tools{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center}.tools input,.tools select{width:auto;min-width:160px}.tools .grow{flex:1;min-width:180px}
+.tw{overflow-x:auto;border:1px solid var(--line)}
+table{border-collapse:collapse;width:100%;min-width:860px;background:var(--ink)}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;font-size:14px}
+th{font:800 14px var(--h);letter-spacing:.12em;text-transform:uppercase;color:var(--gr);background:#0e0e12;position:sticky;top:0}
+.tag{display:inline-block;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:700}
+.tag.y{background:#0f3a24;color:var(--ok)}.tag.n{background:#4a1512;color:#ff8a82}.tag.p{background:#33333a;color:#bbb}
+.dr{display:flex;flex-wrap:wrap;gap:4px}.dr span{background:#000;border:1px solid var(--line);padding:1px 8px;border-radius:12px;font-size:12px}
+.act{display:flex;gap:6px;flex-wrap:wrap}
+.form2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.form2 .full{grid-column:1/-1}
+@media(max-width:700px){.form2{grid-template-columns:1fr}}
+.sched{display:grid;gap:10px}.sched .row{display:grid;grid-template-columns:90px 1fr 2fr auto;gap:8px}
+@media(max-width:700px){.sched .row{grid-template-columns:80px 1fr auto}.sched .row input:nth-child(3){grid-column:1/-1;order:5}}
+.wish{border-left:3px solid var(--red);padding:10px 14px;background:#000;margin-bottom:10px}.wish small{color:var(--gr)}
+.colors{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.colors input[type=color]{width:46px;height:40px;padding:2px}
+.imgup{display:flex;gap:10px;align-items:center}.imgup img{width:54px;height:54px;object-fit:cover;border-radius:4px;background:#000}
+dialog{background:var(--ink);color:#fff;border:1px solid var(--line);border-top:4px solid var(--red);padding:22px;width:min(560px,94vw);margin:auto;max-height:92vh;overflow:auto}
+dialog::backdrop{background:rgba(0,0,0,.7)}
+.chk{display:flex;flex-wrap:wrap;gap:6px 14px}.chk label{display:flex;grid-template:none;align-items:center;gap:6px;color:#ddd}.chk input{width:auto}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 20px;border-radius:30px;font-weight:600;z-index:20}
+</style>
+</head>
+<body>
+<div class="login" id="login">
+  <form id="loginForm">
+    <h1>Pit Wall</h1><p style="color:#9a9aa5">Адмін-панель для Ані та Андрія</p>
+    <label>Пароль<input type="password" id="pw" autocomplete="current-password" autofocus required></label>
+    <p class="err" id="loginErr"></p>
+    <button class="btn">Увійти</button>
+  </form>
+</div>
+
+<div id="app" class="hide">
+  <header>
+    <h1>Pit Wall <b>·</b> A&amp;A</h1>
+    <nav id="tabs">
+      <button data-t="stats" class="on">Статистика</button><button data-t="guests">Гості</button><button data-t="wishes">Побажання</button><button data-t="content">Контент сайту</button>
+    </nav>
+    <div class="act"><a class="btn sec sm" href="/" target="_blank" style="text-decoration:none;display:inline-grid;align-items:center">Сайт ↗</a><button class="btn sec sm" id="logout">Вийти</button></div>
+  </header>
+  <main>
+    <section id="t-stats"></section>
+    <section id="t-guests" class="hide"></section>
+    <section id="t-wishes" class="hide"></section>
+    <section id="t-content" class="hide"></section>
+  </main>
+</div>
+<dialog id="dlg"></dialog>
+<script src="/admin.js"></script>
+</body>
+</html>

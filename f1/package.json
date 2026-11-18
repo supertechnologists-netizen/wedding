@@ -1,0 +1,8 @@
+{
+  "name": "anna-andrii-wedding-grand-prix",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Wedding site ANNA & ANDRII — Formula 1 theme, RSVP + admin panel (zero dependencies, Node 22+)",
+  "scripts": { "start": "node --disable-warning=ExperimentalWarning server.js" },
+  "engines": { "node": ">=22.5" }
+}
