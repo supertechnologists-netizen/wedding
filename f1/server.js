@@ -65,8 +65,15 @@ const DEFAULTS = {
   brideBio: 'Аня — наш штурман: веде маршрутом, знає кожен поворот і завжди знаходить найкращу дорогу. Любить подорожі, каву на світанку і спонтанні поїздки.',
   groomBio: 'Андрій — наш пілот: швидкий розум, тверда рука і спокій на будь-якому віражі. Любить швидкість, музику і рідко пропускає Гран-прі.',
   story: 'Ми зустрілися на найважливішому колі свого життя — і вирішили більше не робити піт-стопів поодинці. Тепер на старті нашої головної гонки хочемо бачити вас.',
-  dressText: 'Вечір у гоночній палітрі: чорний, білий та акценти червоного. Елегантно, стильно, з відчуттям паддоку Монако.',
-  dressColors: ['#0b0b0d', '#f5f5f5', '#e10600', '#8a8a93'],
+  dressText: 'Будемо раді бачити вас у кольорах нашого свята: чорний, червоний і м’які природні відтінки. Просимо залишити білий колір нареченій.',
+  dressColors: [
+    { hex: '#1c1b1a', name: 'Чорний' }, { hex: '#d6001c', name: 'Червоний' }, { hex: '#f4efe6', name: 'Айворі' },
+    { hex: '#c9b79c', name: 'Пісочний' }, { hex: '#7b1e2b', name: 'Бордо' }, { hex: '#8a8f98', name: 'Сталевий' }
+  ],
+  gallery: [
+    { url: '', caption: 'Pole position' }, { url: '', caption: 'Перше коло' }, { url: '', caption: 'Піт-стоп' },
+    { url: '', caption: 'Поворот долі' }, { url: '', caption: 'Спільний фініш' }, { url: '', caption: 'Подіум' }
+  ],
   dressWomen: 'Вечірні сукні, костюми, акценти червоного. Зручне взуття для танців — піт-стоп на паркеті гарантовано.',
   dressMen: 'Костюм або смокінг, біла сорочка, червоний або чорний аксесуар. Краватка — на ваш смак.',
   schedule: [
@@ -224,7 +231,8 @@ async function api(req, res, url) {
     const strKeys = ['groom', 'bride', 'eventDate', 'venueName', 'venueAddress', 'mapUrl', 'rsvpDeadline', 'contactPhone', 'musicUrl', 'heroPhoto', 'bridePhoto', 'groomPhoto', 'couplePhoto', 'brideBio', 'groomBio', 'story', 'dressText', 'dressWomen', 'dressMen'];
     for (const k of strKeys) if (k in b) setSetting(k, str(b[k], 3000));
     if (Array.isArray(b.drinks)) setSetting('drinks', [...new Set(b.drinks.map(d => str(d, 60)).filter(Boolean))].slice(0, 40));
-    if (Array.isArray(b.dressColors)) setSetting('dressColors', b.dressColors.map(c => str(c, 9)).filter(c => /^#[0-9a-f]{3,8}$/i.test(c)).slice(0, 8));
+    if (Array.isArray(b.dressColors)) setSetting('dressColors', b.dressColors.map(c => typeof c === 'string' ? { hex: str(c, 9), name: '' } : { hex: str(c?.hex, 9), name: str(c?.name, 40) }).filter(c => /^#[0-9a-f]{3,8}$/i.test(c.hex)).slice(0, 12));
+    if (Array.isArray(b.gallery)) setSetting('gallery', b.gallery.map(g => ({ url: str(g?.url, 500), caption: str(g?.caption, 60) })).filter(g => g.url || g.caption).slice(0, 12));
     if (Array.isArray(b.schedule)) setSetting('schedule', b.schedule.slice(0, 12).map(s => ({ time: str(s.time, 10), title: str(s.title, 80), text: str(s.text, 400) })).filter(s => s.title));
     return json(res, 200, { ok: true, settings: getSettings() });
   }

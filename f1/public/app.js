@@ -111,38 +111,55 @@
   }
 
   /* =============== CONTENT =============== */
+  const FLAGS = ['green', 'white', 'yellow', 'blue', 'red'];
+  const FLAGNAME = { green: 'Green flag', white: 'White flag', yellow: 'Yellow flag', blue: 'Blue flag', red: 'Red flag' };
+  const flagSvg = n => `<svg viewBox="0 0 36 24"><use href="#flag-${n}"/></svg>`;
+  const colors = () => (S.dressColors || []).map(c => typeof c === 'string' ? { hex: c, name: '' } : c);
+  function photoInto(box, url, alt) {
+    if (!url) return;
+    const img = new Image(); img.alt = alt; img.loading = 'lazy'; img.src = url; box.prepend(img);
+    const m = $('.mono', box); if (m) m.style.display = 'none';
+    box.removeAttribute('data-ph');
+  }
   function fill() {
-    const bride = (S.bride || 'Аня'), groom = (S.groom || 'Андрій');
-    $('#nBride').textContent = bride.toUpperCase().replace('АНЯ', 'ANNA'); $('#nGroom').textContent = groom.toUpperCase().replace('АНДРІЙ', 'ANDRII');
-    const nB = $('#nBride').textContent, nG = $('#nGroom').textContent;
-    document.title = `${nB} & ${nG} · Wedding Grand Prix`;
-    const d = new Date(S.eventDate);
-    const valid = !isNaN(d);
+    const bride = S.bride || 'Аня', groom = S.groom || 'Андрій';
+    const lat = x => x.toUpperCase().replace('АНЯ', 'ANNA').replace('АНДРІЙ', 'ANDRII');
+    $('#nBride').textContent = lat(bride); $('#nGroom').textContent = lat(groom);
+    document.title = `${lat(bride)} & ${lat(groom)} · Запрошення на весілля`;
+    const d = new Date(S.eventDate), valid = !isNaN(d);
     const dateStr = valid ? fmtDate(d, { day: 'numeric', month: 'long', year: 'numeric' }) : '';
-    $('#heroDate').textContent = dateStr; $('#finDate').textContent = dateStr + (S.venueName ? ' · ' + S.venueName : '');
+    $('#heroDate').textContent = dateStr; $('#tagDate').textContent = valid ? fmtDate(d, { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
+    $('#finDate').textContent = dateStr + (S.venueName ? ' · ' + S.venueName : '');
     $('#heroVenue').textContent = S.venueName || '';
     $('#vDate').textContent = valid ? fmtDate(d, { day: 'numeric', month: 'long' }) : '';
-    $('#vWeekday').textContent = valid ? cap(fmtDate(d, { weekday: 'long' })) + ', ' + d.getFullYear() : '';
     $('#vTime').textContent = valid ? fmtDate(d, { hour: '2-digit', minute: '2-digit', hour12: false }) : '';
     $('#vName').textContent = S.venueName || ''; $('#vAddr').textContent = S.venueAddress || '';
     const map = $('#vMap'); if (S.mapUrl) map.href = S.mapUrl; else map.hidden = true;
-    if (S.rsvpDeadline) { const dl = new Date(S.rsvpDeadline + 'T12:00:00'); $('#vDeadline').innerHTML = isNaN(dl) ? '' : `Підтвердіть участь до <b>${fmtDate(dl, { day: 'numeric', month: 'long' })}</b>`; }
+    const q = [S.venueName, S.venueAddress].filter(Boolean).join(', ');
+    if (q) $('#mapFrame').src = 'https://www.google.com/maps?q=' + encodeURIComponent(q) + '&output=embed&hl=uk'; else $('.vmap').hidden = true;
+    if (S.rsvpDeadline) { const dl = new Date(S.rsvpDeadline + 'T12:00:00'); $('#vDeadline').innerHTML = isNaN(dl) ? '' : `Будь ласка, підтвердіть участь до <b>${fmtDate(dl, { day: 'numeric', month: 'long' })}</b>`; }
     $('#story').textContent = S.story || '';
+    photoInto($('#heroArch'), S.heroPhoto || S.couplePhoto, 'Аня та Андрій');
     for (const [id, bio, photo, name] of [['#dBride', S.brideBio, S.bridePhoto, bride], ['#dGroom', S.groomBio, S.groomPhoto, groom]]) {
       const el = $(id); $('.bio', el).textContent = bio || ''; $('h3', el).textContent = name;
-      const ph = $('.photo', el); ph.dataset.ph = name.charAt(0);
-      if (photo) { const img = new Image(); img.alt = name; img.loading = 'lazy'; img.src = photo; ph.prepend(img); }
+      const ph = $('.photo', el); ph.dataset.ph = name.charAt(0); photoInto(ph, photo, name);
     }
-    if (S.couplePhoto) { const f = $('#couple'); $('img', f).src = S.couplePhoto; f.hidden = false; }
-    if (S.heroPhoto) $('#heroPhoto').style.backgroundImage = `url("${S.heroPhoto.replace(/"/g, '%22')}")`;
+    const gal = (S.gallery || []).filter(g => g.url || g.caption);
+    $('#gallery').hidden = !gal.length;
+    $('#gal').innerHTML = gal.map((g, i) => `<figure class="gi rv ${g.url ? '' : 'empty'}">${g.url ? `<img src="${esc(g.url)}" alt="${esc(g.caption)}" loading="lazy">` : ''}${g.caption ? `<figcaption class="cap">${flagSvg(i % 6 === 5 ? 'chk' : FLAGS[i % 5])}${esc(g.caption)}</figcaption>` : ''}</figure>`).join('');
     $('#dressText').textContent = S.dressText || ''; $('#dressW').textContent = S.dressWomen || ''; $('#dressM').textContent = S.dressMen || '';
-    $('#swatches').innerHTML = (S.dressColors || []).map(c => `<div class="sw"><i style="background:${esc(c)}"></i><span>${esc(c)}</span></div>`).join('');
-    $('#drinkChips').innerHTML = (S.drinks || []).map((x, i) => `<label><input type="checkbox" name="drink" value="${esc(x)}"><span>${esc(x)}</span></label>`).join('');
+    const sw = $('#swatches');
+    sw.innerHTML = colors().map((c, i) => `<div class="sw" role="listitem" tabindex="0" data-i="${i}"><i style="background:${esc(c.hex)}"></i><span>${esc(c.name || c.hex)}</span></div>`).join('');
+    const pick = el => { $$('.sw', sw).forEach(x => x.classList.toggle('sel', x === el)); const c = colors()[+el.dataset.i]; $('#swPicked').innerHTML = `Вибраний колір: <b>${esc(c.name || c.hex)}</b> · ${esc(c.hex)}`; Audio_.tick(); };
+    sw.addEventListener('click', e => { const el = e.target.closest('.sw'); if (el) pick(el); });
+    sw.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('sw')) { e.preventDefault(); pick(e.target); } });
+    $('#drinkChips').innerHTML = (S.drinks || []).map(x => `<label><input type="checkbox" name="drink" value="${esc(x)}"><span>${esc(x)}</span></label>`).join('');
+    $('#stops').innerHTML = (S.schedule || []).map((it, i) => `<article class="stop rv" data-i="${i}"><span class="chip">${flagSvg(FLAGS[i % 5])}${esc(it.time || '')} · ${FLAGNAME[FLAGS[i % 5]]}</span><h3>${esc(it.title)}</h3><p>${esc(it.text || '')}</p></article>`).join('');
     if (guest) {
       const first = guest.name.split(' ')[0];
-      $('#greet').innerHTML = `Вітаємо, <b>${esc(guest.name)}</b>! Для вас — персональне запрошення на старт.`;
-      $('#rsvpLead').textContent = `${first}, дайте нам знати, чи будете ви на старті. Це займе хвилину.` + (guest.responded ? ' Ви вже відповіли — за потреби змініть відповідь.' : '');
-    } else $('#greet').textContent = 'Вас запрошено на головну гонку нашого життя';
+      $('#greet').innerHTML = `Особисто для вас, <b>${esc(guest.name)}</b>`;
+      $('#rsvpLead').textContent = `${first}, дайте нам знати, чи будете ви поруч. Це займе хвилину.` + (guest.responded ? ' Ви вже відповіли — за потреби змініть відповідь.' : '');
+    } else $('#greet').textContent = 'Дорогі гості,';
   }
 
   /* =============== COUNTDOWN =============== */
@@ -159,119 +176,57 @@
     tick(); setInterval(tick, 1000);
   }
 
-  /* =============== TRACK (circuit map) =============== */
-  const Track = (() => {
-    const svg = $('#trackSvg'), NS = 'http://www.w3.org/2000/svg';
-    const CFG = {
-      land: { vb: [1000, 520], plate: [1, 1], d: 'M300 440H690C770 440 820 420 835 375C850 330 815 300 765 292L650 275C600 267 590 230 630 205L725 150C775 120 770 75 720 68L560 58C500 52 470 88 440 118C410 148 380 150 350 120C320 90 270 70 220 85C150 105 110 160 120 230C130 290 190 300 230 330C270 360 235 440 300 440Z' },
-      port: { vb: [420, 480], plate: [0, 1], d: 'M120 410H260C310 410 335 380 325 345C315 312 275 305 250 290C225 275 225 250 250 235L300 205C340 180 335 125 290 110C250 97 215 115 190 140C165 165 140 165 120 140C95 110 60 105 45 140C28 180 50 210 75 230C100 250 92 285 70 315C45 350 65 410 120 410Z' }
-    };
-    const FR = { first: 0.14, last: 0.84 };
-    const FLAGS = ['green', 'white', 'yellow', 'blue', 'red'];
-    let mode, P, L, cx = 0, cy = 0, stops = [], cur = -2, p = 0, target = 0, cfg;
-    const el = id => $('#' + id);
-    const mk = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent && parent.appendChild(e); return e; };
-    const pts = (n) => { const a = []; for (let i = 0; i <= n; i++) a.push(P.getPointAtLength(L * i / n)); return a; };
-
+  /* =============== ROAD (wavy road with the car) =============== */
+  const Road = (() => {
+    const sec = $('#route'), svg = $('#road'), NS = 'http://www.w3.org/2000/svg';
+    let pts = [], cum = [], Lt = 0, marks = [], y0 = 0, y1 = 0, built = false, cy = 0, mob = false, timer;
+    const car = $('#car');
+    const mk = (t, a, p) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; };
     function build() {
-      const box = $('.track-box').getBoundingClientRect();
-      const m = box.width / Math.max(box.height, 1) < 1.25 ? 'port' : 'land';
-      if (m === mode) return; mode = m; cfg = CFG[m];
-      svg.setAttribute('viewBox', `0 0 ${cfg.vb[0]} ${cfg.vb[1]}`);
-      for (const id of ['pShadow', 'pRun', 'pKerbR', 'pKerbW', 'pAsphalt', 'pDash', 'pDone']) el(id).setAttribute('d', cfg.d);
-      P = el('pAsphalt'); L = P.getTotalLength();
-      const done = el('pDone'); done.style.strokeDasharray = L; done.style.strokeDashoffset = L;
-      const samp = pts(240); cx = samp.reduce((s, q) => s + q.x, 0) / samp.length; cy = samp.reduce((s, q) => s + q.y, 0) / samp.length;
-      const out = (pt, d) => { const dx = pt.x - cx, dy = pt.y - cy, l = Math.hypot(dx, dy) || 1; return { x: pt.x + dx / l * d, y: pt.y + dy / l * d }; };
-
-      // corner numbers (curvature peaks)
-      const turns = el('turns'); turns.innerHTML = '';
-      const N = 360, S = pts(N), k = [];
-      for (let i = 0; i < N; i++) {
-        const a = S[(i - 7 + N) % N], b = S[i], c = S[(i + 7) % N];
-        const a1 = Math.atan2(b.y - a.y, b.x - a.x), a2 = Math.atan2(c.y - b.y, c.x - b.x);
-        let d = a2 - a1; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI;
-        k.push(d);
-      }
-      const peaks = []; for (let i = 0; i < N; i++) { let ok = Math.abs(k[i]) > .5; for (let j = -14; j <= 14 && ok; j++) if (j && Math.abs(k[(i + j + N) % N]) > Math.abs(k[i])) ok = false; if (ok && i > 8 && i < N - 8) peaks.push(i); }
-      peaks.forEach((i, n) => {
-        const q = S[i], t = { x: S[(i + 2) % N].x - S[(i - 2 + N) % N].x, y: S[(i + 2) % N].y - S[(i - 2 + N) % N].y }, tl = Math.hypot(t.x, t.y) || 1;
-        const sgn = k[i] > 0 ? 1 : -1; const nx = sgn * t.y / tl, ny = -sgn * t.x / tl; // outside of the turn
-        const g = mk('g', { class: 'turn' }, turns);
-        mk('circle', { cx: q.x + nx * 25, cy: q.y + ny * 25, r: 9 }, g);
-        const tx = mk('text', { x: q.x + nx * 25, y: q.y + ny * 25 }, g); tx.textContent = n + 1;
+      const W = sec.clientWidth, H = sec.clientHeight; mob = W < 860;
+      svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('width', W); svg.setAttribute('height', H);
+      const cx = mob ? 28 : W / 2, A = mob ? 11 : 44, P = mob ? 250 : 380, rw = mob ? 30 : 50;
+      svg.style.setProperty('--rw', rw + 'px');
+      const stopsEl = $('#stops'), endEl = $('#venueEnd');
+      y0 = stopsEl.offsetTop - 30; y1 = endEl.offsetTop + 70;
+      const xAt = y => cx + A * Math.sin((y - y0) / P * 2 * Math.PI);
+      pts = []; cum = []; Lt = 0;
+      for (let y = y0; y <= y1; y += 8) { const q = { x: xAt(y), y }; if (pts.length) Lt += Math.hypot(q.x - pts[pts.length - 1].x, q.y - pts[pts.length - 1].y); pts.push(q); cum.push(Lt); }
+      const d = 'M' + pts.map(q => q.x.toFixed(1) + ' ' + q.y.toFixed(1)).join('L');
+      for (const id of ['rEdge', 'rBody', 'rDash', 'rDone']) $('#' + id).setAttribute('d', d);
+      $('#rDone').style.strokeDasharray = Lt; $('#rDone').style.strokeDashoffset = Lt;
+      const g = $('#rMarks'); g.innerHTML = ''; marks = [];
+      $$('.stop', stopsEl).forEach((el, i) => {
+        const my = stopsEl.offsetTop + el.offsetTop + 26, mx = xAt(my);
+        const cardEdge = mob ? 58 : (i % 2 === 0 ? W / 2 + 84 : W / 2 - 84);
+        const gg = mk('g', { class: 'mk' }, g);
+        mk('line', { x1: mx, y1: my, x2: cardEdge, y2: my }, gg);
+        mk('circle', { cx: mx, cy: my, r: mob ? 13 : 19 }, gg);
+        mk('use', { href: '#flag-' + FLAGS[i % 5], x: mx - (mob ? 9 : 13), y: my - (mob ? 6 : 8.5), width: mob ? 18 : 26, height: mob ? 12 : 17 }, gg);
+        marks.push({ y: my, g: gg, el });
       });
-
-      // start / finish line
-      const sl = el('startLine'); sl.innerHTML = '';
-      const s0 = P.getPointAtLength(0), s1 = P.getPointAtLength(4), ang = Math.atan2(s1.y - s0.y, s1.x - s0.x) * 180 / Math.PI;
-      const g = mk('g', { transform: `translate(${s0.x} ${s0.y}) rotate(${ang})` }, sl);
-      for (let r = 0; r < 6; r++) for (let c = 0; c < 2; c++) mk('rect', { x: -5 + c * 5, y: -15 + r * 5, width: 5, height: 5, fill: (r + c) % 2 ? '#fff' : '#000' }, g);
-      mk('rect', { x: -5, y: -15, width: 10, height: 30, fill: 'none', stroke: '#fff', 'stroke-width': .8 }, g);
-
-      // pit-board plates
-      const L1 = el('leaders'), G = el('stops'); L1.innerHTML = ''; G.innerHTML = ''; stops = [];
-      const items = S_items(); const W = m === 'land' ? 1 : .84;
-      items.forEach((it, i) => {
-        const fr = items.length === 1 ? FR.first : FR.first + (FR.last - FR.first) * i / (items.length - 1);
-        stops.push(plate(it, i, fr, W, out, L1, G));
-      });
-      // venue plate at start/finish
-      const vp = out(s0, 0); const vy = s0.y + 62;
-      const w = 150, h = 44 * W, x = clampX(s0.x - w / 2, w), y = Math.min(vy, cfg.vb[1] - h - 4);
-      mk('path', { class: 'leader on', d: `M${s0.x} ${s0.y + 14}V${y}` }, L1);
-      const pg = mk('g', { class: 'plate fin', transform: `translate(${x} ${y})` }, G);
-      mk('path', { class: 'bg', d: `M0 0H${w}V${h - 9}L${w - 9} ${h}H0Z` }, pg); mk('rect', { class: 'bar', width: 5, height: h }, pg);
-      const fl = mk('use', { href: '#flag-chk', x: 12, y: h / 2 - 9, width: 27, height: 18 }, pg);
-      const t1 = mk('text', { class: 'tm', x: 46, y: 18 * W + 2 }, pg); t1.textContent = 'FINISH';
-      const t2 = mk('text', { class: 'tt', x: 46, y: h - 9 }, pg); t2.textContent = trunc(S.venueName || 'Фініш', 17);
-      cur = -2; place(p);
+      const e = $('#rEnd'); e.innerHTML = ''; const ex = xAt(y1);
+      mk('line', { x1: ex, y1: y1, x2: ex, y2: y1 - 50, stroke: '#1c1b1a', 'stroke-width': 2 }, e);
+      mk('use', { href: '#flag-chk', x: ex, y: y1 - 52, width: 38, height: 25 }, e);
+      built = true; place();
     }
-    const S_items = () => S.schedule || [];
-    const trunc = (t, n) => t.length > n ? t.slice(0, n - 1) + '…' : t;
-    const clampX = (x, w) => Math.max(6, Math.min(cfg.vb[0] - w - 6, x));
-    function plate(it, i, fr, W, out, Lg, G) {
-      const pt = P.getPointAtLength(L * fr), ap = out(pt, 78 * W);
-      const w = Math.max(132, 60 + Math.min(22, (it.title || '').length) * 9.4), h = 46 * W;
-      const x = clampX(ap.x - w / 2, w), y = Math.max(6, Math.min(cfg.vb[1] - h - 6, ap.y - h / 2));
-      const ld = mk('path', { class: 'leader', d: `M${pt.x} ${pt.y}L${x + w / 2} ${y + h / 2}` }, Lg);
-      const g = mk('g', { class: 'plate', transform: `translate(${x} ${y})` }, G);
-      mk('path', { class: 'bg', d: `M0 0H${w}V${h - 9}L${w - 9} ${h}H0Z` }, g); mk('rect', { class: 'bar', width: 5, height: h }, g);
-      mk('use', { href: '#flag-' + FLAGS[i % FLAGS.length], x: 12, y: h / 2 - 9, width: 27, height: 18 }, g);
-      const t1 = mk('text', { class: 'tm', x: 46, y: 18 * W + 2 }, g); t1.textContent = it.time || '';
-      const t2 = mk('text', { class: 'tt', x: 46, y: h - 9 }, g); t2.textContent = trunc(it.title || '', 22);
-      return { fr, g, ld };
+    function place() {
+      if (!built) return;
+      const r = sec.getBoundingClientRect();
+      const targetY = clamp(-r.top + innerHeight * .55, y0, y1);
+      cy += (targetY - cy) * (reduced ? 1 : .14); if (Math.abs(targetY - cy) < .3) cy = targetY;
+      const i = Math.min(pts.length - 2, Math.max(0, Math.floor((cy - y0) / 8)));
+      const a = pts[i], b = pts[i + 1], t = clamp((cy - a.y) / (b.y - a.y || 1), 0, 1);
+      const x = a.x + (b.x - a.x) * t, len = cum[i] + (cum[i + 1] - cum[i]) * t;
+      const ang = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI;
+      car.setAttribute('transform', `translate(${x} ${cy}) rotate(${ang}) scale(${mob ? .78 : 1})`);
+      $('#rDone').style.strokeDashoffset = Lt - len;
+      marks.forEach(m => { const on = cy >= m.y - 4; if (on !== m.g.classList.contains('on')) { m.g.classList.toggle('on', on); m.el.classList.toggle('active', on); if (on) Audio_.stop(); } });
     }
-    function place(prog) {
-      if (!P) return;
-      const len = L * prog, pt = P.getPointAtLength(len), a = P.getPointAtLength(Math.max(0, len - 3)), b = P.getPointAtLength(Math.min(L, len + 3));
-      let ang = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI;
-      if (prog <= .001) { const n = P.getPointAtLength(4); ang = Math.atan2(n.y - pt.y, n.x - pt.x) * 180 / Math.PI; }
-      el('car').setAttribute('transform', `translate(${pt.x} ${pt.y}) rotate(${ang}) scale(${mode === 'land' ? 1.35 : 1.15})`);
-      el('pDone').style.strokeDashoffset = L - len;
-      let idx = -1; stops.forEach((s, i) => { if (prog >= s.fr - .004) idx = i; });
-      if (prog >= .992) idx = stops.length; // finished
-      if (idx !== cur) {
-        const first = cur === -2; cur = idx;
-        stops.forEach((s, i) => { s.g.classList.toggle('on', i <= idx); s.g.classList.toggle('cur', i === idx); s.ld.classList.toggle('on', i <= idx); });
-        card(idx, !first);
-      }
-    }
-    function card(idx, anim) {
-      const items = S_items(), fin = idx >= items.length, it = items[Math.max(0, Math.min(idx, items.length - 1))] || {};
-      $('#scTime').textContent = idx < 0 ? 'START' : fin ? 'FINISH' : (it.time || '');
-      $('#scTitle').textContent = idx < 0 ? 'Старт гонки' : fin ? (S.venueName || 'Фініш') : it.title || '';
-      $('#scText').textContent = idx < 0 ? 'Прокручуйте вниз — болід вирушає в коло, а з ним і наш весільний день.' : fin ? 'Ви на місці! Картатий прапор — і вечір починається.' : it.text || '';
-      $('#scFlag').setAttribute('href', '#flag-' + (idx < 0 ? 'green' : fin ? 'chk' : FLAGS[idx % FLAGS.length]));
-      $('#scDots').innerHTML = items.map((_, i) => `<i class="${i <= idx ? 'on' : ''}"></i>`).join('');
-      const c = $('#stopCard'); if (anim) { c.classList.remove('swap'); void c.offsetWidth; c.classList.add('swap'); Audio_.stop(); }
-    }
-    function measure() { const r = $('#route').getBoundingClientRect(); target = clamp(-r.top / Math.max(r.height - innerHeight, 1), 0, 1); }
-    function frame() {
-      measure(); p += (target - p) * (reduced ? 1 : .12); if (Math.abs(target - p) < .0004) p = target;
-      if (P) place(clamp(p, 0, 1));
-    }
-    return { init() { build(); addEventListener('resize', () => build()); }, frame };
+    return {
+      init() { build(); new ResizeObserver(() => { clearTimeout(timer); timer = setTimeout(build, 120); }).observe(sec); addEventListener('load', build); },
+      frame: place
+    };
   })();
 
   /* =============== RSVP =============== */
@@ -346,13 +301,13 @@
       nav.classList.toggle('solid', scrollY > 40);
       document.documentElement.style.setProperty('--sx', -(scrollY * .35 % 56) + 'px');
       nav.style.setProperty('--prog', (scrollY / Math.max(1, document.documentElement.scrollHeight - innerHeight) * 100) + '%');
-      Track.frame();
+      Road.frame();
       ticking = false;
     };
     const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(loop); } };
     addEventListener('scroll', onScroll, { passive: true }); addEventListener('resize', onScroll);
     // keep easing smooth after scroll stops
-    setInterval(() => { Track.frame(); }, 60);
+    setInterval(() => { Road.frame(); }, 60);
     loop();
   }
 
@@ -362,7 +317,7 @@
       const r = await fetch('/api/site' + (urlCode ? '?g=' + encodeURIComponent(urlCode) : ''), { cache: 'no-store' });
       const j = await r.json(); S = j.settings; guest = j.guest;
     } catch { S = { schedule: [], drinks: [], dressColors: [] }; }
-    fill(); countdown(); rsvp(); Track.init(); chrome(); runIntro();
+    fill(); countdown(); rsvp(); Road.init(); chrome(); runIntro();
     if (location.hash.length > 1) setTimeout(() => { const t = document.querySelector(location.hash); t && t.scrollIntoView(); }, 50);
   })();
 })();

@@ -128,15 +128,36 @@
       <h3 class="full">Дрес-код</h3>
       <label class="full">Опис<textarea name="dressText" rows="2">${esc(s.dressText)}</textarea></label>
       <label>Для неї<textarea name="dressWomen" rows="3">${esc(s.dressWomen)}</textarea></label><label>Для нього<textarea name="dressMen" rows="3">${esc(s.dressMen)}</textarea></label>
-      <div class="full"><label>Кольори палітри</label><div class="colors" id="colors"></div></div>
+      <div class="full"><label>Кольори дрес-коду (кружечки на сайті)</label><div class="colors" id="colors"></div></div>
+      <h3 class="full">Галерея (фото з підписами-прапорцями)</h3>
+      <div class="full sched" id="galList"></div>
       <h3 class="full">Програма дня (етапи маршруту)</h3>
       <div class="full sched" id="sched"></div><div class="full"><button type="button" class="btn sec sm" id="addStop">+ Додати етап</button></div>
       <h3 class="full">Напої в RSVP (список для гостей)</h3>
       <label class="full">По одному в рядок<textarea name="drinks" rows="9">${esc(s.drinks.join('\n'))}</textarea></label>
       <div class="full act"><button class="btn">Зберегти зміни</button><span class="ok" id="saved"></span></div></form>`;
+    const normC = l => l.map(c => typeof c === 'string' ? { hex: c, name: '' } : c);
     const colors = () => $('#colors');
-    const drawColors = list => { colors().innerHTML = list.map(c => `<input type="color" value="${esc(c)}">`).join('') + '<button type="button" class="btn sec sm" id="addC">+</button><button type="button" class="btn sec sm" id="rmC">−</button>'; $('#addC').onclick = () => drawColors([...$$('input', colors()).map(i => i.value), '#ffffff']); $('#rmC').onclick = () => drawColors($$('input', colors()).map(i => i.value).slice(0, -1)); };
-    drawColors(s.dressColors);
+    const readC = () => $$('.crow', colors()).map(r => ({ hex: $('input[type=color]', r).value, name: $('input[type=text]', r).value }));
+    const drawColors = list => {
+      colors().innerHTML = list.map((c, i) => `<div class="crow"><input type="color" value="${esc(c.hex)}"><input type="text" placeholder="Назва кольору" value="${esc(c.name)}"><button type="button" class="btn sm danger" data-rc="${i}">✕</button></div>`).join('') + '<div><button type="button" class="btn sec sm" id="addC">+ Додати колір</button></div>';
+      $('#addC').onclick = () => drawColors([...readC(), { hex: '#ffffff', name: '' }]);
+    };
+    drawColors(normC(s.dressColors));
+    colors().onclick = e => { const b = e.target.closest('[data-rc]'); if (b) { const l = readC(); l.splice(+b.dataset.rc, 1); drawColors(l); } };
+    const gal = () => $('#galList');
+    const readG = () => $$('.grow', gal()).map(r => ({ url: $('input[name=gu]', r).value, caption: $('input[name=gc]', r).value }));
+    const drawGal = list => {
+      gal().innerHTML = list.map((g, i) => `<div class="grow"><img src="${esc(g.url)}" alt="" onerror="this.style.visibility='hidden'"><input name="gc" placeholder="Підпис (напр. Pole position)" value="${esc(g.caption)}"><input name="gu" placeholder="URL фото" value="${esc(g.url)}"><label class="btn sec sm" style="display:inline-grid;color:#fff;cursor:pointer">Файл<input type="file" accept="image/*" data-gup="${i}" hidden></label><button type="button" class="btn sm danger" data-rg="${i}">✕</button></div>`).join('') + '<div><button type="button" class="btn sec sm" id="addG">+ Додати фото</button></div>';
+      $('#addG').onclick = () => drawGal([...readG(), { url: '', caption: '' }]);
+    };
+    drawGal(s.gallery || []);
+    gal().onclick = e => { const b = e.target.closest('[data-rg]'); if (b) { const l = readG(); l.splice(+b.dataset.rg, 1); drawGal(l); } };
+    gal().addEventListener('change', e => {
+      const fi = e.target.closest('[data-gup]'); if (!fi || !fi.files[0]) return;
+      const fr = new FileReader(); fr.onload = async () => { try { const j = await api('/api/admin/upload', 'POST', { data: fr.result }); const l = readG(); l[+fi.dataset.gup].url = j.url; drawGal(l); toast('Файл завантажено — натисніть «Зберегти»'); } catch (x) { toast(x.message); } };
+      fr.readAsDataURL(fi.files[0]);
+    });
     const drawSched = list => {
       $('#sched').innerHTML = list.map((x, i) => `<div class="row"><input placeholder="14:30" value="${esc(x.time)}"><input placeholder="Назва" value="${esc(x.title)}"><input placeholder="Опис" value="${esc(x.text)}"><button type="button" class="btn sm danger" data-rm="${i}">✕</button></div>`).join('');
     };
@@ -151,7 +172,7 @@
       }; fr.readAsDataURL(fi.files[0]);
     });
     $('#cf').onsubmit = async e => {
-      e.preventDefault(); const f = e.target, body = { schedule: readSched(), dressColors: $$('input', colors()).map(i => i.value), drinks: f.drinks.value.split('\n') };
+      e.preventDefault(); const f = e.target, body = { schedule: readSched(), dressColors: readC(), gallery: readG(), drinks: f.drinks.value.split('\n') };
       for (const k of ['bride', 'groom', 'eventDate', 'rsvpDeadline', 'venueName', 'venueAddress', 'mapUrl', 'story', 'brideBio', 'groomBio', 'bridePhoto', 'groomPhoto', 'couplePhoto', 'heroPhoto', 'musicUrl', 'dressText', 'dressWomen', 'dressMen']) body[k] = f[k].value;
       if (body.eventDate.length === 16) body.eventDate += ':00';
       try { const j = await api('/api/admin/settings', 'PUT', body); D.settings = j.settings; toast('Збережено ✓'); } catch (x) { toast(x.message); }
